@@ -260,14 +260,14 @@ hr {
 @-webkit-keyframes supermedalanim
 {
 	0%   {background: #e5e54c; }
-	50%  {background: red;}
+	50%  {background: #ffff67;}
 	100% {background: #e5e54c;}
 }
 
 @keyframes supermedalanim
 {
 	0%   {background: #e5e54c; }
-	50%  {background: red;}
+	50%  {background: #ffff67;}
 	100% {background: #e5e54c;}
 }
 

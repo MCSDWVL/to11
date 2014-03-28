@@ -723,7 +723,9 @@ GameManager.prototype.medalLevelForCurrentMovesAndLevel = function()
 	var bestMoves = this.movesTaken;
 	if(bestMoves == 0)
 		return 0;
-	if(bestMoves <= level.gold)
+	else if(bestMoves < level.gold)
+		return 4;
+	else if(bestMoves == level.gold)
 		return 3;
 	else if(bestMoves <= level.silver)
 		return 2;
@@ -741,7 +743,9 @@ GameManager.prototype.medalLevel = function(levelNum)
 	var bestMoves = this.storageManager.getBestMovesToComplete(level.lvl);
 	if(bestMoves == 0)
 		return 0;
-	if(bestMoves <= level.gold)
+	else if(bestMoves < level.gold)
+		return 4;
+	else if(bestMoves == level.gold)
 		return 3;
 	else if(bestMoves <= level.silver)
 		return 2;
