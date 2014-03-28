@@ -301,6 +301,7 @@ hr {
 
 .locked
 {
+	font-size: 25px;
 	background: rgba(200, 200, 200, 1);
     filter:alpha(opacity=20); /* IE */
     opacity: 0.2; /* Safari, Opera */
