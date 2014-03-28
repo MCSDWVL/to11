@@ -40,8 +40,8 @@ function GameManager(size, InputManager, Actuator, StorageManager, seed, level, 
 						{lvl: "XX6084X407X0X50X", gold:11, silver:15, bronze:20, price:6},		// 7
 						{lvl: "6X4X006056505476", gold:19, silver:30, bronze:40, price:7},		// 8
 						{lvl: "1511021367637260", gold:17, silver:30, bronze:40, price:8},		// 9
-						{lvl: "6534660605125166", gold:19, silver:23, bronze:40, price:9},		// 10
-						{lvl: "0110515440170384", gold:21, silver:30, bronze:40, price:10},		// 11
+						{lvl: "6534660605125166", gold:18, silver:23, bronze:40, price:9},		// 10
+						{lvl: "0110515440170384", gold:20, silver:30, bronze:40, price:10},		// 11
 
 						// Hard
 						{lvl: "1371466150057414", gold:28, silver:60, bronze:70, price:11},		// 12
