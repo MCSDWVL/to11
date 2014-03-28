@@ -31,7 +31,7 @@ function GameManager(size, InputManager, Actuator, StorageManager, seed, level, 
 	this.levels = [		// Easy
 						{lvl: "0X65060566076XXX", gold:5, silver:15, bronze:20, price:0},		// 1
 						{lvl: "500X766X57005XX5", gold:8, silver:15, bronze:20, price:1},		// 2
-						{lvl: "4200XX05237X608X", gold:12, silver:25, bronze:30, price:2},		// 3
+						{lvl: "4200XX05237X608X", gold:11, silver:25, bronze:30, price:2},		// 3
 						{lvl: "4524236470630347", gold:18, silver:20, bronze:30, price:3},		// 4
 						{lvl: "08570314X160011X", gold:17, silver:30, bronze:40, price:4},		// 5
 						{lvl: "XXX5X08X650006X6", gold:11, silver:15, bronze:20, price:5},		// 6
@@ -44,10 +44,10 @@ function GameManager(size, InputManager, Actuator, StorageManager, seed, level, 
 						{lvl: "0110515440170384", gold:21, silver:30, bronze:40, price:10},		// 11
 
 						// Hard
-						{lvl: "1371466150057414", gold:46, silver:60, bronze:70, price:11},		// 12
-						{lvl: "5004630466043576", gold:40, silver:50, bronze:90, price:12},		// 13
+						{lvl: "1371466150057414", gold:28, silver:60, bronze:70, price:11},		// 12
+						{lvl: "5004630466043576", gold:39, silver:50, bronze:90, price:12},		// 13
 						{lvl: "00083X7XX50435X5", gold:14, silver:50, bronze:100, price:13},	// 14
-						{lvl: "1143053101533837", gold:23, silver:40, bronze:50, price:14},		// 15
+						{lvl: "1143053101533837", gold:17, silver:40, bronze:50, price:14},		// 15
 
 						// very hard
 						{lvl: "2X733600482300X4", gold:34, silver:90, bronze:100, price:30},	// 16
