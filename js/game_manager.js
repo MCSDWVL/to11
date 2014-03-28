@@ -31,9 +31,9 @@ function GameManager(size, InputManager, Actuator, StorageManager, seed, level, 
 	this.levels = [		// Easy
 						{lvl: "0X65060566076XXX", gold:5, silver:15, bronze:20, price:0},		// 1
 						{lvl: "500X766X57005XX5", gold:8, silver:15, bronze:20, price:1},		// 2
-						{lvl: "4200XX05237X608X", gold:13, silver:25, bronze:30, price:2},		// 3
-						{lvl: "4524236470630347", gold:19, silver:20, bronze:30, price:3},		// 4
-						{lvl: "08570314X160011X", gold:18, silver:30, bronze:40, price:4},		// 5
+						{lvl: "4200XX05237X608X", gold:12, silver:25, bronze:30, price:2},		// 3
+						{lvl: "4524236470630347", gold:18, silver:20, bronze:30, price:3},		// 4
+						{lvl: "08570314X160011X", gold:17, silver:30, bronze:40, price:4},		// 5
 						{lvl: "XXX5X08X650006X6", gold:11, silver:15, bronze:20, price:5},		// 6
 
 						// Medium
