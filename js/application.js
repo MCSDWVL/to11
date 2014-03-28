@@ -80,7 +80,7 @@ window.showMainMenu = function ()
 					window.onLevelSelect(z);
 				});
 
-				wrapper.addEventListener(this.eventTouchstart, function (event)
+				wrapper.addEventListener((window.navigator.msPointerEnabled ? "MSPointerDown" : "touchstart"), function (event)
 				{
 					window.onLevelSelect(z);
 				});
