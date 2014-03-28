@@ -227,6 +227,7 @@ HTMLActuator.prototype.clearMessage = function () {
   this.messageContainer.getElementsByClassName("won-medal")[0].classList.remove("gold");
   this.messageContainer.getElementsByClassName("won-medal")[0].classList.remove("silver");
   this.messageContainer.getElementsByClassName("won-medal")[0].classList.remove("bronze");
+  this.messageContainer.getElementsByClassName("won-medal")[0].classList.remove("supermedal");
 };
 
 HTMLActuator.prototype.setBoardString = function (gridString)
