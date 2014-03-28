@@ -308,7 +308,6 @@ hr {
     z-index: 20;
 }
 
-
 .tile-container {
   position: absolute;
   z-index: 2; }
@@ -715,7 +714,14 @@ hr {
     .grid-cell:last-child {
       margin-right: 0; }
  
-  .level-select, .locked
+  .level-select
+  {
+  	width:57.5px;
+  	height:57.5px;
+  	font-size: 12px;
+  }
+  
+  .locked
   {
   	width:57.5px;
   	height:57.5px;
