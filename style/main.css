@@ -715,7 +715,7 @@ hr {
     .grid-cell:last-child {
       margin-right: 0; }
  
-  .level-select, .level-select .locked
+  .level-select, .locked
   {
   	width:57.5px;
   	height:57.5px;
