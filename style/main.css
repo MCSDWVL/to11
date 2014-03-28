@@ -247,6 +247,68 @@ hr {
 	height:106.25px;
 }
 
+.gold { background: #e5e54c; }
+.silver { background: #D4D4D4; }
+.bronze { background: #B08510; }
+
+.large-medal
+{
+	width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    float:center;
+    margin-left: auto;
+	margin-right: auto;	
+}
+
+.game-container .game-message .large-medal
+{
+	margin-top:92px;
+}
+
+.small-medal 
+{
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    float:center;
+    margin-left: auto ;
+	margin-right: auto ;	
+}
+
+.medal-numbers .small-medal
+{
+	margin-right:0;
+	margin-left:0;
+	float:left;
+	color:White;
+	font-size: 18px;
+	text-align: center;
+	line-height:35px;
+	font-weight: bold;
+}
+
+.context-string
+{
+	float:right;
+	line-height:35px;
+}
+
+.board-array
+{
+	text-align:center;
+}
+
+.locked
+{
+	background: rgba(200, 200, 200, 1);
+    filter:alpha(opacity=20); /* IE */
+    opacity: 0.2; /* Safari, Opera */
+    -moz-opacity:0.20; /* FireFox */
+    z-index: 20;
+}
+
+
 .tile-container {
   position: absolute;
   z-index: 2; }
@@ -554,13 +616,13 @@ hr {
     margin-bottom: 10px; }
 
   .game-intro {
-    width: 55%;
+    width: 40%;
     display: block;
     box-sizing: border-box;
     line-height: 1.65; }
 
   .next-button, .restart-button, .menu-button {
-    width: 42%;
+    width: 20%;
     padding: 0;
     display: block;
     box-sizing: border-box;
@@ -652,12 +714,55 @@ hr {
     background: rgba(238, 228, 218, 0.35); }
     .grid-cell:last-child {
       margin-right: 0; }
-  
+ 
   .level-select
   {
   	width:57.5px;
   	height:57.5px;
+  	font-size: 12px;
   }
+  
+  .large-medal
+	{
+		width: 80px;
+		height: 80px;
+		border-radius: 50%;
+		float:center;
+		margin-left: auto;
+		margin-right: auto;	
+	}
+
+	.game-container .game-message .large-medal
+	{
+		margin-top:92px;
+	}
+
+	.level-select .small-medal
+	{
+		position:relative;
+		margin-top:-20px;
+	}
+	.small-medal 
+	{	
+		width: 25px;
+		height: 25px;
+		border-radius: 50%;
+		float:center;
+		margin-left: auto ;
+		margin-right: auto ;	
+	}
+
+	.medal-numbers .small-medal
+	{
+		margin-right:0;
+		margin-left:0;
+		float:left;
+		color:White;
+		font-size: 18px;
+		text-align: center;
+		line-height:35px;
+		font-weight: bold;
+	}
   
   .tile-container {
     position: absolute;
@@ -742,64 +847,3 @@ hr {
     margin-top: 90px !important; }
   .game-message .lower {
     margin-top: 30px !important; } }
-
-.gold { background: #e5e54c; }
-.silver { background: #D4D4D4; }
-.bronze { background: #B08510; }
-
-.large-medal
-{
-	width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    float:center;
-    margin-left: auto ;
-	margin-right: auto ;	
-}
-
-.game-container .game-message .large-medal
-{
-	margin-top:92px;
-}
-
-.small-medal 
-{
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    float:center;
-    margin-left: auto ;
-	margin-right: auto ;	
-}
-
-.medal-numbers .small-medal
-{
-	margin-right:0;
-	margin-left:0;
-	float:left;
-	color:White;
-	font-size: 18px;
-	text-align: center;
-	line-height:35px;
-	font-weight: bold;
-}
-
-.context-string
-{
-	float:right;
-	line-height:35px;
-}
-
-.board-array
-{
-	text-align:center;
-}
-
-.locked
-{
-	background: rgba(200, 200, 200, 1);
-    filter:alpha(opacity=20); /* IE */
-    opacity: 0.2; /* Safari, Opera */
-    -moz-opacity:0.20; /* FireFox */
-    z-index: 20;
-}
