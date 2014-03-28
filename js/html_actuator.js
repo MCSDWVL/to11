@@ -213,7 +213,7 @@ HTMLActuator.prototype.message = function (won)
 	this.messageContainer.classList.add(type);
 	this.messageContainer.getElementsByTagName("p")[0].textContent = message;
 
-	var medalClass = ["none", "bronze", "silver", "gold"][this.medalLevel];
+	var medalClass = ["none", "bronze", "silver", "gold","supermedal"][this.medalLevel];
 	this.messageContainer.getElementsByClassName("won-medal")[0].classList.add("large-medal");
 	this.messageContainer.getElementsByClassName("won-medal")[0].classList.add(medalClass);
 };

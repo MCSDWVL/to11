@@ -247,9 +247,29 @@ hr {
 	height:106.25px;
 }
 
+.supermedal
+{
+	-webkit-animation: supermedalanim 1s linear infinite; /* Chrome, Safari, Opera */
+	animation: supermedalanim 1s linear infinite;
+}
+
 .gold { background: #e5e54c; }
 .silver { background: #D4D4D4; }
 .bronze { background: #B08510; }
+
+@-webkit-keyframes supermedalanim
+{
+	0%   {background: #e5e54c; }
+	50%  {background: #f5f55c;}
+	100% {background: #e5e54c;}
+}
+
+@keyframes supermedalanim
+{
+	0%   {background: #e5e54c; }
+	50%  {background: #f5f55c;}
+	100% {background: #e5e54c;}
+}
 
 .large-medal
 {
