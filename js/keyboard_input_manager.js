@@ -69,8 +69,15 @@ KeyboardInputManager.prototype.listen = function ()
 		// R key does robot shit
 		if (!modifiers && event.which === 82)
 		{
-			var solver = new Solver(window.gm.grid, 100);
-			alert("done!");
+			for (var i = 1; i < 10; ++i)
+			{
+				var solver = new Solver(window.gm.grid, i * 10);
+				if (solver.solved)
+				{
+					alert("done!");
+					break;
+				}
+			}
 		}
 	});
 

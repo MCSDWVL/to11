@@ -9,12 +9,19 @@ function Solver(grid, maxMoves)
 	this.grid = grid;
 	this.maxMoves = maxMoves;
 	this.bestMovesSoFar = maxMoves;
+	this.solved = false;
 
 	var solution = this.solveRecursive(grid, []);
-	console.log("Solved: " + solution.solved);
+	console.log("Solved in " + solution.moves.length + ": " + solution.solved);
 	var solveString = "";
 	for (var i = 0; i < solution.moves.length; ++i)
-		solveString += ["U","R","D","L"][solution.moves[i]];
+	{
+		if (i != 0 && i % 4 == 0)
+			solveString += " ";
+		solveString += ["U", "R", "D", "L"][solution.moves[i]];
+	}
+
+	this.solved = solution.solved;
 	console.log(solveString);
 };
 
@@ -48,27 +55,29 @@ Solver.prototype.solveRecursive = function (grid, movesTaken)
 		if (!moveResult.moved)
 			continue;
 
-		allMoves.push({ dir: dir, grid: clonedGrid });
+		allMoves.push({ dir: dir, grid: clonedGrid, merged: moveResult.merged });
 	}
 
 	// sort all possible moves by how many merges it will cause
-	allMoves.sort(function(a,b){return a.merged-b.merged});
+	allMoves.sort(function (a, b) { return b.merged - a.merged });
 
 	// recurse on each move now that they're sorted
-	for(var mi = 0; mi < allMoves.length; ++mi)
+	for (var mi = 0; mi < allMoves.length; ++mi)
 	{
 		// add the moveee
 		movesTaken.push(allMoves[mi].dir);
 
 		// recurse
 		var solution = this.solveRecursive(allMoves[mi].grid, movesTaken);
-		
+
 		// did recursing lead to a solution?
 		if (solution.solved)
 		{
 			// is it a better solution?
 			if (!bestSolution.solved || solution.moves.length < bestSolution.moves.length)
 			{
+				if (this.bestMovesSoFar == this.maxMoves)
+					console.log("Got first solution! " + solution.moves.length);
 				bestSolution.solved = true;
 				bestSolution.moves = solution.moves.slice(0);
 				if (bestSolution.moves.length < this.bestMovesSoFar)
@@ -85,7 +94,7 @@ Solver.prototype.solveRecursive = function (grid, movesTaken)
 
 Solver.prototype.movesAvailable = function (grid)
 {
-	return grid.cellsAvailable() || this.tileMatchesAvailable();
+	return grid.cellsAvailable() || this.tileMatchesAvailable(grid);
 };
 
 // Check for available matches between tiles (more expensive check)
