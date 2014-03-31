@@ -36,6 +36,7 @@ Solver.prototype.solveRecursive = function (grid, movesTaken)
 
 	// try each direction recursively
 	// HOW can I bias this towards doing moves that cause merges, to get ANY solution first?
+	var allMoves = [];
 	for (var dir = 0; dir < 4; ++dir)
 	{
 		// clone the grid?
@@ -43,18 +44,29 @@ Solver.prototype.solveRecursive = function (grid, movesTaken)
 
 		// move the grid
 		this.prepareTiles(clonedGrid);
-		var moved = this.move(dir, clonedGrid);
-		if (!moved)
+		var moveResult = this.move(dir, clonedGrid);
+		if (!moveResult.moved)
 			continue;
 
+		allMoves.push({ dir: dir, grid: clonedGrid });
+	}
+
+	// sort all possible moves by how many merges it will cause
+	allMoves.sort(function(a,b){return a.merged-b.merged});
+
+	// recurse on each move now that they're sorted
+	for(var mi = 0; mi < allMoves.length; ++mi)
+	{
 		// add the moveee
-		movesTaken.push(dir);
+		movesTaken.push(allMoves[mi].dir);
 
 		// recurse
-		var solution = this.solveRecursive(clonedGrid, movesTaken);
-		gCounter++;
+		var solution = this.solveRecursive(allMoves[mi].grid, movesTaken);
+		
+		// did recursing lead to a solution?
 		if (solution.solved)
 		{
+			// is it a better solution?
 			if (!bestSolution.solved || solution.moves.length < bestSolution.moves.length)
 			{
 				bestSolution.solved = true;
@@ -146,6 +158,7 @@ Solver.prototype.moveTile = function (tile, cell, grid)
 // Move tiles on the grid in the specified direction
 Solver.prototype.move = function (direction, grid)
 {
+	var result = { moved: false, merged: 0 };
 	var self = this;
 	// if (this.isGameTerminated()) return; // Don't do anything if the game's over
 
@@ -180,6 +193,8 @@ Solver.prototype.move = function (direction, grid)
 					// Converge the two tiles' positions
 					tile.updatePosition(positions.next);
 
+					// caused a merge!
+					result.merged++;
 				}
 				else
 				{
@@ -188,13 +203,13 @@ Solver.prototype.move = function (direction, grid)
 
 				if (!self.positionsEqual(cell, tile))
 				{
-					moved = true; // The tile moved from its original cell!
+					result.moved = true;
 				}
 			}
 		});
 	});
 
-	return moved;
+	return result;
 };
 
 // Get the vector representing the chosen direction
