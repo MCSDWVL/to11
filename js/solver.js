@@ -10,6 +10,7 @@ function Solver(grid, maxMoves)
 	this.maxMoves = maxMoves;
 	this.bestMovesSoFar = maxMoves;
 	this.solved = false;
+	this.visitedDictionary = {};
 
 	var solution = this.solveRecursive(grid, []);
 	console.log("Solved in " + solution.moves.length + ": " + solution.solved);
@@ -21,6 +22,7 @@ function Solver(grid, maxMoves)
 		solveString += ["U", "R", "D", "L"][solution.moves[i]];
 	}
 
+	
 	this.solved = solution.solved;
 	console.log(solveString);
 };
@@ -40,6 +42,15 @@ Solver.prototype.solveRecursive = function (grid, movesTaken)
 	// check if this is game over?
 	if (!this.movesAvailable(grid))
 		return { solved: false, moves: movesTaken.slice(0) };
+
+	// check if we've visited this board config faster already
+	var boardString = this.getGridAsSimpleString(grid);
+	if (this.visitedDictionary[boardString] && this.visitedDictionary[boardString] <= movesTaken.length)
+	{
+		return { solved: false, moves: movesTaken.slice(0) };
+	}
+	else
+		this.visitedDictionary[boardString] = movesTaken.length;
 
 	// try each direction recursively
 	// HOW can I bias this towards doing moves that cause merges, to get ANY solution first?
@@ -287,3 +298,11 @@ Solver.prototype.prepareTiles = function (grid)
 	});
 };
 
+Solver.prototype.getGridAsSimpleString = function (grid)
+{
+	var plainoutput = "";
+	for (var x = 0; x < grid.size; x++)
+		for (var y = 0; y < grid.size; y++)
+			plainoutput += grid.cells[x][y] ? (grid.cells[x][y].value == 0 ? 0 : Math.log(grid.cells[x][y].value) / Math.LN2) : "X";
+	return plainoutput;
+};
