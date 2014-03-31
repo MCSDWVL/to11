@@ -69,13 +69,8 @@ KeyboardInputManager.prototype.listen = function ()
 		// R key does robot shit
 		if (!modifiers && event.which === 82)
 		{
-			var gamesToTest = 5;
-			for (var g = 0; g < gamesToTest; ++g)
-			{
-				var maxMoves = 5000;
-				for (var i = 0; i < maxMoves; ++i)
-					self.emit("move", (Math.floor(Math.random() * 100)) % 4);
-			}
+			var solver = new Solver(window.gm.grid, 100);
+			alert("done!");
 		}
 	});
 

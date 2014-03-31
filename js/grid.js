@@ -17,7 +17,27 @@ Grid.prototype.empty = function () {
   }
 
   return cells;
-};
+ };
+
+ Grid.prototype.createClone = function ()
+ {
+ 	var newGrid = new Grid(this.size);
+ 	var cells = [];
+
+ 	for (var x = 0; x < this.size; x++)
+ 	{
+ 		var row = cells[x] = [];
+
+ 		for (var y = 0; y < this.size; y++)
+ 		{
+ 			var tile = this.cells[x][y];
+ 			row.push(tile ? new Tile({ x: tile.x, y: tile.y }, tile.value) : null);
+ 		}
+ 	}
+
+ 	newGrid.cells = cells;
+ 	return newGrid;
+ }
 
 Grid.prototype.fromState = function (state) {
   var cells = [];
