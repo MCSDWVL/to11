@@ -247,6 +247,11 @@ hr {
 	height:106.25px;
 }
 
+.game-container .game-message .large-medal
+{
+	margin-top:92px;
+}
+
 .supermedal
 {
 	-webkit-animation: supermedalanim 1s linear infinite; /* Chrome, Safari, Opera */
@@ -272,18 +277,13 @@ hr {
 }
 
 .large-medal
-{
+{	
 	width: 80px;
-    height: 80px;
+	height: 80px;
     border-radius: 50%;
     float:center;
     margin-left: auto;
 	margin-right: auto;	
-}
-
-.game-container .game-message .large-medal
-{
-	margin-top:92px;
 }
 
 .small-medal 
@@ -742,26 +742,16 @@ hr {
   	font-size: 12px;
   }
   
+	.game-container .game-message .large-medal
+	{
+		margin-top:46px;
+	}
+	
   .locked
   {
   	font-size: 12px;
   }
   
-  .large-medal
-	{
-		width: 80px;
-		height: 80px;
-		border-radius: 50%;
-		float:center;
-		margin-left: auto;
-		margin-right: auto;	
-	}
-
-	.game-container .game-message .large-medal
-	{
-		margin-top:92px;
-	}
-
 	.level-select .small-medal
 	{
 		position:relative;
@@ -869,6 +859,6 @@ hr {
     font-size: 30px !important;
     height: 30px !important;
     line-height: 30px !important;
-    margin-top: 90px !important; }
+    margin-top: 45px !important; }
   .game-message .lower {
     margin-top: 30px !important; } }
