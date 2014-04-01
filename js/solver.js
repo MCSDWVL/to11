@@ -22,8 +22,8 @@ function Solver(grid, maxMoves)
 		solveString += ["U", "R", "D", "L"][solution.moves[i]];
 	}
 
-	
 	this.solved = solution.solved;
+	this.solutionMoves = solution.moves;
 	console.log(solveString);
 };
 

@@ -178,7 +178,7 @@ GameManager.prototype.setup = function ()
 	}
 	else
 	{
-		this.actuator.setMedalNumbers("--", "--", "--");
+		//this.actuator.setMedalNumbers("--", "--", "--");
 		if(this.isEditor)
 			this.actuator.setContextString("EDITOR: Use Left/Right Click");
 		else if(this.customLevelString)
@@ -216,6 +216,9 @@ GameManager.prototype.addStartTiles = function ()
 
 		for (var i = 0; i < this.numWalls; ++i)
 			this.addRandomPosTileOfValue(0);
+
+		var solver = new Solver(this.grid, 50);
+		this.actuator.setMedalNumbers(solver.solutionMoves.length, solver.solutionMoves.length*2, solver.solutionMoves.length*3);
 	}
 };
 
