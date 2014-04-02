@@ -16,6 +16,7 @@ function GameManager(size, InputManager, Actuator, StorageManager, seed, level, 
 	this.levelIdentifier = "X";
 	this.customLevelString = customLevelString;
 	this.isEditor = editor != null && editor != undefined && editor != false;
+	this.loading = false;
 
 	this.startingBudget = 512;
 	this.startTiles = 8;
@@ -191,7 +192,12 @@ GameManager.prototype.setup = function ()
 		else
 			this.actuator.setContextString("Random - " + this.initialSeed);
 	}
-	this.actuate();
+
+	if(!this.loading)
+	{
+		console.log("here");
+		this.actuate();
+	}
 };
 
 // Set up the initial tiles to start the game with
@@ -208,6 +214,9 @@ GameManager.prototype.addStartTiles = function ()
 	}
 	else
 	{
+		this.actuator.showLoadingMessage();
+		this.loading = true;
+		//this.actuate();
 		var added = this.addTilesToMeetBudget(this.startingBudget);
 
 		// gut feeling that odd numbered tiles create more traps, ensure even number
@@ -216,10 +225,16 @@ GameManager.prototype.addStartTiles = function ()
 
 		for (var i = 0; i < this.numWalls; ++i)
 			this.addRandomPosTileOfValue(0);
-
-		var solver = new Solver(this.grid, 50);
-		this.actuator.setMedalNumbers(solver.solutionMoves.length, solver.solutionMoves.length*2, solver.solutionMoves.length*3);
+		var solver = new Solver(this.grid, 50, this.onSolverFinished);		
 	}
+};
+
+GameManager.prototype.onSolverFinished = function (solver)
+{
+	window.gm.actuator.setMedalNumbers(solver.bestSolution.movesTaken.length, solver.bestSolution.movesTaken.length*2, solver.bestSolution.movesTaken.length*3);
+	window.gm.actuator.clearMessage();
+	window.gm.actuate();
+	this.loading = false;
 };
 
 GameManager.prototype.findLowestSplittableTileAndSplit = function ()

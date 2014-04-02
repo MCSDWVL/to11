@@ -1,7 +1,7 @@
 "use strict";
 
 var gCounter = 0;
-function Solver(grid, maxMoves)
+function Solver(grid, maxMoves, callback)
 {
 	if(maxMoves == null || maxMoves == undefined || maxMoves <= 0 || isNaN(maxMoves))
 		maxMoves = 100;
@@ -11,7 +11,13 @@ function Solver(grid, maxMoves)
 	this.bestMovesSoFar = maxMoves;
 	this.solved = false;
 	this.visitedDictionary = {};
+	this.needEvaluation = [];
+	this.bestSolution = null;
+	this.busy = false;
+	this.iterativeFinishedCallback = callback;
+	this.solveIterativeSetup(grid);
 
+	/*
 	var solution = this.solveRecursive(grid, []);
 	console.log("Solved in " + solution.moves.length + ": " + solution.solved);
 	var solveString = "";
@@ -22,9 +28,108 @@ function Solver(grid, maxMoves)
 		solveString += ["U", "R", "D", "L"][solution.moves[i]];
 	}
 
+
+
 	this.solved = solution.solved;
 	this.solutionMoves = solution.moves;
-	console.log(solveString);
+	
+	console.log(solveString);*/
+};
+
+Solver.prototype.solveIterativeSetup = function (startingGrid)
+{
+	this.addAllNextSolutions(startingGrid, []);
+	this.solveIterator = setInterval((function (self){ return function() { self.solveIterativeStep(); } })(this), 1);
+};
+
+Solver.prototype.solveIterativeFinish = function()
+{
+	clearInterval(this.solveIterator);
+	console.log("finish!");
+	if(this.iterativeFinishedCallback)
+		this.iterativeFinishedCallback(this);	
+};
+
+Solver.prototype.solveIterativeStep = function ()
+{
+	if (this.busy)
+		return false;
+	this.busy = true;
+
+	var solutionsToCheckPerIter = 1;
+	for (var soli = 0; soli < solutionsToCheckPerIter; ++soli)
+	{
+		//console.log("step");
+		// no more solutions to check!?
+		if (!(this.needEvaluation && this.needEvaluation.length > 0))
+		{
+			console.log("wat");
+			this.solveIterativeFinish();
+			break;
+		}
+
+		var solutionToEval = this.needEvaluation.pop();
+		var movesTaken = solutionToEval.movesTaken;
+		var grid = solutionToEval.grid;
+
+		// over the limit, give up!
+		if (movesTaken.length > this.maxMoves || movesTaken.length >= this.bestMovesSoFar)
+		{
+			continue;
+		}
+
+		// check if this is game over?
+		if (!this.movesAvailable(grid))
+		{
+			continue;
+		}
+
+		// check if this is a solution!?
+		if (this.singleTileLeft(grid))
+		{
+			if (this.bestSolution == null || (movesTaken.length < this.bestSolution.movesTaken.length))
+			{
+				console.log("found new best solution " + solutionToEval.movesTaken);
+				this.bestMovesSoFar = solutionToEval.movesTaken.length;
+				this.bestSolution = solutionToEval;
+				continue;
+			}
+		}
+
+		// check & remember if we've visited this board config faster already
+		var boardString = this.getGridAsSimpleString(grid);
+		if (this.visitedDictionary[boardString] && this.visitedDictionary[boardString] <= movesTaken.length)
+		{
+			continue;
+		}
+		else
+			this.visitedDictionary[boardString] = movesTaken.length;
+
+		// figure out all moves we could make from here and add them to solutions to be evaluated
+		this.addAllNextSolutions(grid, movesTaken);
+	}
+
+	this.busy = false;
+};
+
+Solver.prototype.addAllNextSolutions = function (grid, movesTaken)
+{
+	for (var dir = 0; dir < 4; ++dir)
+	{
+		// clone the grid?
+		var clonedGrid = grid.createClone();
+
+		// move the grid
+		this.prepareTiles(clonedGrid);
+		var moveResult = this.move(dir, clonedGrid);
+		if (!moveResult.moved)
+			continue;
+
+		var nextSolutionMoves = movesTaken.slice(0);
+		nextSolutionMoves.push(dir);
+		var someEval = { movesTaken: nextSolutionMoves, grid: clonedGrid };
+		this.needEvaluation.push(someEval);
+	}
 };
 
 Solver.prototype.solveRecursive = function (grid, movesTaken)
