@@ -225,13 +225,21 @@ GameManager.prototype.addStartTiles = function ()
 
 		for (var i = 0; i < this.numWalls; ++i)
 			this.addRandomPosTileOfValue(0);
-		var solver = new Solver(this.grid, 50, this.onSolverFinished);		
+		if(this.solver)
+		{
+			this.solver.cancel();
+			console.log("canceling!");
+		}
+		this.solver = new Solver(this.grid, 50, this.onSolverFinished);		
 	}
 };
 
 GameManager.prototype.onSolverFinished = function (solver)
 {
-	window.gm.actuator.setMedalNumbers(solver.bestSolution.movesTaken.length, solver.bestSolution.movesTaken.length*2, solver.bestSolution.movesTaken.length*3);
+	if(solver.bestSolution && solver.bestSolution.movesTaken)
+		window.gm.actuator.setMedalNumbers(solver.bestSolution.movesTaken.length, solver.bestSolution.movesTaken.length*2, solver.bestSolution.movesTaken.length*3);
+	else
+		window.gm.actuator.setMedalNumbers(0, 0, 0);
 	window.gm.actuator.clearMessage();
 	window.gm.actuate();
 	this.loading = false;

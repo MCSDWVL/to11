@@ -1,11 +1,13 @@
 "use strict";
 
 var gCounter = 0;
+var gKnownSolutions = {};
 function Solver(grid, maxMoves, callback)
 {
 	if(maxMoves == null || maxMoves == undefined || maxMoves <= 0 || isNaN(maxMoves))
 		maxMoves = 100;
 
+	this.startingBoardString = this.getGridAsSimpleString(grid);
 	this.grid = grid;
 	this.maxMoves = maxMoves;
 	this.bestMovesSoFar = maxMoves;
@@ -36,18 +38,37 @@ function Solver(grid, maxMoves, callback)
 	console.log(solveString);*/
 };
 
-Solver.prototype.solveIterativeSetup = function (startingGrid)
+Solver.prototype.cancel = function ()
 {
-	this.addAllNextSolutions(startingGrid, []);
-	this.solveIterator = setInterval((function (self){ return function() { self.solveIterativeStep(); } })(this), 1);
+	if (this.solveIterator)
+		clearInterval(this.solveIterator);
+	this.solveIterator = null;
 };
 
-Solver.prototype.solveIterativeFinish = function()
+Solver.prototype.solveIterativeSetup = function (startingGrid)
+{
+	if (gKnownSolutions[this.startingBoardString])
+	{
+		this.bestSolution = gKnownSolutions[this.startingBoardString];
+		this.solveIterativeFinish();
+	}
+	else
+	{
+		this.addAllNextSolutions(startingGrid, []);
+		this.solveIterator = setInterval((function (self) { return function () { self.solveIterativeStep(); } })(this), 1);
+	}
+};
+
+Solver.prototype.solveIterativeFinish = function ()
 {
 	clearInterval(this.solveIterator);
+	this.solveIterator = null;
 	console.log("finish!");
-	if(this.iterativeFinishedCallback)
-		this.iterativeFinishedCallback(this);	
+
+	gKnownSolutions[this.startingBoardString] = this.bestSolution;
+
+	if (this.iterativeFinishedCallback)
+		this.iterativeFinishedCallback(this);
 };
 
 Solver.prototype.solveIterativeStep = function ()
