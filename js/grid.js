@@ -87,7 +87,12 @@ Grid.prototype.eachCell = function (callback) {
 // Check if there are any cells available
 Grid.prototype.cellsAvailable = function () {
   return !!this.availableCells().length;
-};
+ };
+
+ Grid.prototype.cellsOccupied = function ()
+ {
+ 	return this.size*this.size - this.cellsAvailable();
+ };
 
 // Check if the specified cell is taken
 Grid.prototype.cellAvailable = function (cell) {

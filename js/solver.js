@@ -54,7 +54,7 @@ Solver.prototype.solveIterativeSetup = function (startingGrid)
 	}
 	else
 	{
-		this.addAllNextSolutions(startingGrid, []);
+		this.addAllNextSolutions(startingGrid, [], startingGrid.cellsOccupied());
 		this.solveIterator = setInterval((function (self) { return function () { self.solveIterativeStep(); } })(this), 1);
 	}
 };
@@ -77,7 +77,18 @@ Solver.prototype.solveIterativeStep = function ()
 		return false;
 	this.busy = true;
 
-	var solutionsToCheckPerIter = 1;
+	// sort the solutions to eval by....
+	if (this.needEvaluation && this.needEvaluation.length > 0)
+		this.needEvaluation.sort(function (a, b)
+		{
+			// if tile counds are the same, return the one with the fewest moves
+			if (a.tileCount == b.tileCount)
+				return a.movesTaken.length - b.movesTaken.length;
+			else
+				return a.tileCount - b.tileCount;
+		});
+
+	var solutionsToCheckPerIter = 25;
 	for (var soli = 0; soli < solutionsToCheckPerIter; ++soli)
 	{
 		//console.log("step");
@@ -127,13 +138,13 @@ Solver.prototype.solveIterativeStep = function ()
 			this.visitedDictionary[boardString] = movesTaken.length;
 
 		// figure out all moves we could make from here and add them to solutions to be evaluated
-		this.addAllNextSolutions(grid, movesTaken);
+		this.addAllNextSolutions(grid, movesTaken, solutionToEval.tileCount);
 	}
 
 	this.busy = false;
 };
 
-Solver.prototype.addAllNextSolutions = function (grid, movesTaken)
+Solver.prototype.addAllNextSolutions = function (grid, movesTaken, tileCount)
 {
 	for (var dir = 0; dir < 4; ++dir)
 	{
@@ -148,7 +159,7 @@ Solver.prototype.addAllNextSolutions = function (grid, movesTaken)
 
 		var nextSolutionMoves = movesTaken.slice(0);
 		nextSolutionMoves.push(dir);
-		var someEval = { movesTaken: nextSolutionMoves, grid: clonedGrid };
+		var someEval = { movesTaken: nextSolutionMoves, grid: clonedGrid, tileCount:tileCount - moveResult.merged };
 		this.needEvaluation.push(someEval);
 	}
 };
