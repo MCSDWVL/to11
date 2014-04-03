@@ -42,6 +42,20 @@ function Solver(grid, maxMoves, finishCallback, newBestCallback, probablyImpossi
 	console.log(solveString);*/
 };
 
+Solver.prototype.movesTakenToHumanReadableString = function (movesTaken, divideCounter)
+{
+	if (isNaN(divideCounter))
+		divideCounter = 4;
+	var solveString = "";
+	for (var i = 0; i < movesTaken.length; ++i)
+	{
+		if (divideCounter > 0 && i != 0 && i % divideCounter == 0)
+			solveString += " ";
+		solveString += ["U", "R", "D", "L"][movesTaken[i]];
+	}
+	return solveString;
+}
+
 Solver.prototype.cancel = function ()
 {
 	if (this.solveIterator)
@@ -55,6 +69,8 @@ Solver.prototype.solveIterativeSetup = function (startingGrid)
 	if (gKnownSolutions[this.startingBoardString])
 	{
 		this.bestSolution = gKnownSolutions[this.startingBoardString];
+		if (this.iterativeNewBestCallback)
+			this.iterativeNewBestCallback(this);
 		this.solveIterativeFinish();
 	}
 	else
@@ -131,7 +147,7 @@ Solver.prototype.solveIterativeStep = function ()
 		{
 			if (this.bestSolution == null || (movesTaken.length < this.bestSolution.movesTaken.length))
 			{
-				console.log(gCounter + " found new best solution " + solutionToEval.movesTaken);
+				console.log(gCounter + " found new best solution " + this.movesTakenToHumanReadableString(solutionToEval.movesTaken, 4));
 				this.bestMovesSoFar = solutionToEval.movesTaken.length;
 				this.bestSolution = solutionToEval;
 
