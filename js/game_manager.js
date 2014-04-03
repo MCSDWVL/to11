@@ -249,9 +249,9 @@ GameManager.prototype.onSolverProbablyGiveUp = function (solver)
 GameManager.prototype.onSolverFindAnySolution = function (solver)
 {
 	if(solver.bestSolution && solver.bestSolution.movesTaken)
-		window.gm.actuator.setMedalNumbers(solver.bestSolution.movesTaken.length, solver.bestSolution.movesTaken.length*2, solver.bestSolution.movesTaken.length*3);
+		window.gm.actuator.setMedalNumbers("?", "?", "?");
 	else
-		window.gm.actuator.setMedalNumbers(0, 0, 0);
+		window.gm.actuator.setMedalNumbers("--", "--", "--");
 
 	if(window.gm.loading)
 	{
@@ -268,7 +268,10 @@ GameManager.prototype.onSolverFinished = function (solver)
 	if(!solver.bestSolution || !solver.bestSolution.movesTaken)
 		window.gm.keepPlaying();
 	else
+	{
+		window.gm.actuator.setMedalNumbers(solver.bestSolution.movesTaken.length, solver.bestSolution.movesTaken.length*2, solver.bestSolution.movesTaken.length*3);
 		window.gm.loading = false;
+	}
 };
 
 GameManager.prototype.findLowestSplittableTileAndSplit = function ()
