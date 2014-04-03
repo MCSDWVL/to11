@@ -220,13 +220,23 @@ GameManager.prototype.addStartTiles = function ()
 		this.actuator.showLoadingMessage();
 		this.loading = true;
 		//this.actuate();
-		var added = this.addTilesToMeetBudget(this.startingBudget);
+		//var added = this.addTilesToMeetBudget(this.startingBudget);
 
 		// gut feeling that odd numbered tiles create more traps, ensure even number
-		if (added % 2 != 0)
-			this.findLowestSplittableTileAndSplit();
+		//if (added % 2 != 0)
+		//	this.findLowestSplittableTileAndSplit();
 
-		for (var i = 0; i < this.numWalls; ++i)
+		// at least 7 tiles, at most 16
+		var tilesToAdd = Math.floor(this.seededRandom() * 16); 
+		if(tilesToAdd < 7)
+			tilesToAdd = 7;
+
+		this.addTilesToMeetFillCount(tilesToAdd);
+
+		// 4, 5, or 6 walls
+		var numWalls = Math.round(4 + this.seededRandom()*2);
+		console.log("want to add " + numWalls + " walls");
+		for (var i = 0; i < numWalls; ++i)
 			this.addRandomPosTileOfValue(0);
 		this.solver = new Solver(this.grid, 50, this.onSolverFinished, this.onSolverFindAnySolution, this.onSolverProbablyGiveUp);		
 	}
@@ -293,6 +303,42 @@ GameManager.prototype.findLowestSplittableTileAndSplit = function ()
 	{
 		console.log("uh oh odd tiles !!");
 	}
+};
+
+GameManager.prototype.addTilesToMeetFillCount = function (fillCount)
+{
+	// start with just 1 tile
+	var valuesGonnaAdd = [512];
+	var numTwos = 0;
+
+	// split random values in half until achieve fill count
+	for(var i = 0; i < fillCount-1; ++i)
+	{
+		var pos = Math.floor(this.seededRandom() * valuesGonnaAdd.length);
+		
+		// pick a random value to remove
+		var val = valuesGonnaAdd[pos];
+		valuesGonnaAdd.splice(pos, 1);
+
+		// keep two's separate so we don't try to split them
+		if(val == 4)
+		{
+			numTwos += 2;
+		}
+		else
+		{
+			valuesGonnaAdd.push(val/2);
+			valuesGonnaAdd.push(val/2);
+		}
+	}
+
+	// add the non-twos
+	for(var i = 0; i < valuesGonnaAdd.length; ++i)
+		this.addRandomPosTileOfValue(valuesGonnaAdd[i]);
+
+	// add the twos
+	for(var i = 0; i < numTwos; ++i)
+		this.addRandomPosTileOfValue(2);
 };
 
 GameManager.prototype.addTilesToMeetBudget = function (budget)
