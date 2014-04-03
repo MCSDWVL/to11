@@ -215,6 +215,8 @@ hr {
 		animation: fade-in 80ms ease 120ms;
 		-webkit-animation-fill-mode: both;
 		-moz-animation-fill-mode: both;}
+	.game-container .game-message.game-loading a.retry-button {
+		display: none; }
 
 .grid-container {
   position: absolute;
@@ -724,6 +726,8 @@ hr {
 		animation: fade-in 80ms ease 120ms;
 		-webkit-animation-fill-mode: both;
 		-moz-animation-fill-mode: both;}
+	  .game-container .game-message.game-loading a.retry-button {
+		display: none; }
 
   .grid-container {
     position: absolute;

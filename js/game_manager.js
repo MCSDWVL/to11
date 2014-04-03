@@ -224,10 +224,7 @@ GameManager.prototype.addStartTiles = function ()
 		for (var i = 0; i < this.numWalls; ++i)
 			this.addRandomPosTileOfValue(0);
 		if(this.solver)
-		{
 			this.solver.cancel();
-			console.log("canceling!");
-		}
 		this.solver = new Solver(this.grid, 50, this.onSolverFinished, this.onSolverFindAnySolution, this.onSolverProbablyGiveUp);		
 	}
 };
