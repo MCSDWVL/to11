@@ -235,7 +235,6 @@ GameManager.prototype.addStartTiles = function ()
 
 		// 4, 5, or 6 walls
 		var numWalls = Math.round(4 + this.seededRandom()*2);
-		console.log("want to add " + numWalls + " walls");
 		for (var i = 0; i < numWalls; ++i)
 			this.addRandomPosTileOfValue(0);
 		this.solver = new Solver(this.grid, 50, this.onSolverFinished, this.onSolverFindAnySolution, this.onSolverProbablyGiveUp);		
@@ -298,10 +297,6 @@ GameManager.prototype.findLowestSplittableTileAndSplit = function ()
 		this.grid.removeTile(lowestTile);
 		this.addRandomPosTileOfValue(val / 2);
 		this.addRandomPosTileOfValue(val / 2);
-	}
-	else
-	{
-		console.log("uh oh odd tiles !!");
 	}
 };
 
