@@ -197,7 +197,6 @@ GameManager.prototype.setup = function ()
 
 	if(!this.loading)
 	{
-		console.log("here");
 		this.actuate();
 	}
 };
@@ -207,10 +206,12 @@ GameManager.prototype.addStartTiles = function ()
 {
 	if(this.customLevelString != null && this.customLevelString != undefined)
 	{
+		this.loading = false;
 		this.populateGridFromSimpleString(this.customLevelString);
 	}
 	else if(this.level != null && this.level != undefined && !isNaN(this.level))
 	{
+		this.loading = false;
 		var levelString = this.levels[this.level].lvl;
 		this.populateGridFromSimpleString(levelString);
 	}
