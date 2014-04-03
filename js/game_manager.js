@@ -114,7 +114,7 @@ GameManager.prototype.goToMenu = function ()
 // Return true if the game is lost, or has won and the user hasn't kept playing
 GameManager.prototype.isGameTerminated = function () 
 {
-	if (this.over || (this.won && !this.keepPlaying)) 
+	if (this.over || this.won) 
 		return true;
 	else 
 		return false;
@@ -149,7 +149,6 @@ GameManager.prototype.setup = function ()
 		this.score = previousState.score;
 		this.over = previousState.over;
 		this.won = previousState.won;
-		this.keepPlaying = previousState.keepPlaying;
 		this.movesTaken = previousState.movesTaken;
 		this.highestTileMade = previousState.highestTileMade;
 		this.highestTileMadeAtMove = previousState.highestTileMadeAtMove;
@@ -159,7 +158,6 @@ GameManager.prototype.setup = function ()
 		this.score = 0;
 		this.over = false;
 		this.won = false;
-		this.keepPlaying = false;
 		this.movesTaken = 0;
 		this.highestTileMade = 0;
 		this.highestTileMadeAtMove = 0;
@@ -230,19 +228,38 @@ GameManager.prototype.addStartTiles = function ()
 			this.solver.cancel();
 			console.log("canceling!");
 		}
-		this.solver = new Solver(this.grid, 50, this.onSolverFinished);		
+		this.solver = new Solver(this.grid, 50, this.onSolverFinished, this.onSolverFindAnySolution, this.onSolverProbablyGiveUp);		
 	}
 };
 
-GameManager.prototype.onSolverFinished = function (solver)
+GameManager.prototype.onSolverProbablyGiveUp = function (solver)
+{
+	window.gm.keepPlaying();
+};
+
+GameManager.prototype.onSolverFindAnySolution = function (solver)
 {
 	if(solver.bestSolution && solver.bestSolution.movesTaken)
 		window.gm.actuator.setMedalNumbers(solver.bestSolution.movesTaken.length, solver.bestSolution.movesTaken.length*2, solver.bestSolution.movesTaken.length*3);
 	else
 		window.gm.actuator.setMedalNumbers(0, 0, 0);
-	window.gm.actuator.clearMessage();
-	window.gm.actuate();
-	this.loading = false;
+
+	if(window.gm.loading)
+	{
+		window.gm.actuator.clearMessage();
+		window.gm.actuate();
+		window.gm.actuator.setContextString("(Solving) Random - " + window.gm.initialSeed);
+		window.gm.loading = false;
+	}
+};
+
+GameManager.prototype.onSolverFinished = function (solver)
+{
+	window.gm.actuator.setContextString("Random - " + window.gm.initialSeed);
+	if(!solver.bestSolution || !solver.bestSolution.movesTaken)
+		window.gm.keepPlaying();
+	else
+		window.gm.loading = false;
 };
 
 GameManager.prototype.findLowestSplittableTileAndSplit = function ()
@@ -382,7 +399,6 @@ GameManager.prototype.serialize = function () {
     score:       this.score,
     over:        this.over,
     won:         this.won,
-    keepPlaying: this.keepPlaying
   };
 };
 

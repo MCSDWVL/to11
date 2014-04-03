@@ -102,6 +102,7 @@ Solver.prototype.solveIterativeStep = function ()
 	for (var soli = 0; soli < solutionsToCheckPerIter; ++soli)
 	{
 		gCounter++;
+
 		// no more solutions to check!?
 		if (!(this.needEvaluation && this.needEvaluation.length > 0))
 		{
@@ -133,6 +134,10 @@ Solver.prototype.solveIterativeStep = function ()
 				console.log(gCounter + " found new best solution " + solutionToEval.movesTaken);
 				this.bestMovesSoFar = solutionToEval.movesTaken.length;
 				this.bestSolution = solutionToEval;
+
+				if (this.iterativeNewBestCallback)
+					this.iterativeNewBestCallback(this);
+
 				continue;
 			}
 		}
@@ -149,6 +154,10 @@ Solver.prototype.solveIterativeStep = function ()
 		// figure out all moves we could make from here and add them to solutions to be evaluated
 		this.addAllNextSolutions(grid, movesTaken, solutionToEval.tileCount);
 	}
+
+	var haveNoSolution = this.bestSolution == null;
+	if (haveNoSolution && gCounter > this.probablyGiveUpCap && this.iterativeProbablyImpossibleCallback)
+		this.iterativeProbablyImpossibleCallback(this);
 
 	this.busy = false;
 };
