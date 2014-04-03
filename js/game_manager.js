@@ -136,6 +136,10 @@ GameManager.prototype.setup = function ()
 {
 	var previousState = null; //this.storageManager.getGameState();
 
+	// shut down any solver that might be running
+	if(this.solver)
+		this.solver.cancel();
+
 	// figureout how many medals the user has
 	this.medalCount = 0;
 	for(var i = 0; i < this.levels.length; ++i)
@@ -223,8 +227,6 @@ GameManager.prototype.addStartTiles = function ()
 
 		for (var i = 0; i < this.numWalls; ++i)
 			this.addRandomPosTileOfValue(0);
-		if(this.solver)
-			this.solver.cancel();
 		this.solver = new Solver(this.grid, 50, this.onSolverFinished, this.onSolverFindAnySolution, this.onSolverProbablyGiveUp);		
 	}
 };
