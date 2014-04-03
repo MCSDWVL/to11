@@ -207,7 +207,7 @@ HTMLActuator.prototype.updateNextButton = function ()
 
 HTMLActuator.prototype.showLoadingMessage = function (show)
 {
-	this.messageContainer.classList.add("game-over");
+	this.messageContainer.classList.add("game-loading");
 	this.messageContainer.getElementsByTagName("p")[0].textContent = "Loading...";
 	this.messageContainer.getElementsByClassName("won-medal")[0].classList.add("large-medal");
 	this.messageContainer.getElementsByClassName("won-medal")[0].classList.add("supermedal");
@@ -230,6 +230,7 @@ HTMLActuator.prototype.clearMessage = function () {
   // IE only takes one value to remove at a time.
   this.messageContainer.classList.remove("game-won");
   this.messageContainer.classList.remove("game-over");
+  this.messageContainer.classList.remove("game-loading");
 
   this.messageContainer.getElementsByClassName("won-medal")[0].classList.remove("large-medal");
   this.messageContainer.getElementsByClassName("won-medal")[0].classList.remove("gold");

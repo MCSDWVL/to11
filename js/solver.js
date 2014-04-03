@@ -2,11 +2,12 @@
 
 var gCounter = 0;
 var gKnownSolutions = {};
-function Solver(grid, maxMoves, callback)
+function Solver(grid, maxMoves, finishCallback, newBestCallback, probablyImpossibleCallback)
 {
 	if(maxMoves == null || maxMoves == undefined || maxMoves <= 0 || isNaN(maxMoves))
-		maxMoves = 100;
+		maxMoves = 50;
 
+	this.probablyGiveUpCap = 1000;
 	this.startingBoardString = this.getGridAsSimpleString(grid);
 	this.grid = grid;
 	this.maxMoves = maxMoves;
@@ -16,7 +17,10 @@ function Solver(grid, maxMoves, callback)
 	this.needEvaluation = [];
 	this.bestSolution = null;
 	this.busy = false;
-	this.iterativeFinishedCallback = callback;
+
+	this.iterativeFinishedCallback = finishCallback;
+	this.iterativeNewBestCallback = newBestCallback;
+	this.iterativeProbablyImpossibleCallback = probablyImpossibleCallback;
 	this.solveIterativeSetup(grid);
 
 	/*
@@ -47,6 +51,7 @@ Solver.prototype.cancel = function ()
 
 Solver.prototype.solveIterativeSetup = function (startingGrid)
 {
+	gCounter = 0;
 	if (gKnownSolutions[this.startingBoardString])
 	{
 		this.bestSolution = gKnownSolutions[this.startingBoardString];
@@ -81,21 +86,25 @@ Solver.prototype.solveIterativeStep = function ()
 	if (this.needEvaluation && this.needEvaluation.length > 0)
 		this.needEvaluation.sort(function (a, b)
 		{
+			// heuristically the cost of the solution is the moves taken plus the fewest moves we could take to finish
+			// the fewest moves we could use to finish is the log of the number of tiles
+			var aScore = a.movesTaken.length + Math.log(a.tileCount) / Math.LN2
+			var bScore = b.movesTaken.length + Math.log(b.tileCount) / Math.LN2
+			return aScore - bScore;
 			// if tile counds are the same, return the one with the fewest moves
-			if (a.tileCount == b.tileCount)
-				return a.movesTaken.length - b.movesTaken.length;
-			else
-				return a.tileCount - b.tileCount;
+			//if (a.tileCount == b.tileCount)
+			//	return a.movesTaken.length - b.movesTaken.length;
+			//else
+			//	return a.tileCount - b.tileCount;
 		});
 
-	var solutionsToCheckPerIter = 25;
+	var solutionsToCheckPerIter = 10;
 	for (var soli = 0; soli < solutionsToCheckPerIter; ++soli)
 	{
-		//console.log("step");
+		gCounter++;
 		// no more solutions to check!?
 		if (!(this.needEvaluation && this.needEvaluation.length > 0))
 		{
-			console.log("wat");
 			this.solveIterativeFinish();
 			break;
 		}
@@ -121,7 +130,7 @@ Solver.prototype.solveIterativeStep = function ()
 		{
 			if (this.bestSolution == null || (movesTaken.length < this.bestSolution.movesTaken.length))
 			{
-				console.log("found new best solution " + solutionToEval.movesTaken);
+				console.log(gCounter + " found new best solution " + solutionToEval.movesTaken);
 				this.bestMovesSoFar = solutionToEval.movesTaken.length;
 				this.bestSolution = solutionToEval;
 				continue;
