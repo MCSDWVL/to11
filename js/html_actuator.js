@@ -246,9 +246,9 @@ HTMLActuator.prototype.setBoardString = function (gridString)
 	this.boardStringContainer.innerHTML += "<a href=\"?editor=1&custom=XXXXXXXXXXXXXXXX\">Level Editor</a>";
 };
 
-HTMLActuator.prototype.setMedalNumbers = function (gold, silver, bronze)
+HTMLActuator.prototype.setMedalNumbers = function (gold, silver, bronze, final)
 {
-	this.medalContainer.innerHTML = "<div class='small-medal gold'>" + gold + "</div><div class='small-medal silver'>" + silver + "</div><div class='small-medal bronze'>" + bronze + "</div>";
+	this.medalContainer.innerHTML = "<div class='small-medal gold " + (!final ? "counting" : "") + "'>" + gold + "</div><div class='small-medal silver " + (!final ? "counting" : "") + "'>" + silver + "</div><div class='small-medal bronze " + (!final ? "counting" : "") + "'>" + bronze + "</div>";
 };
 
 HTMLActuator.prototype.setContextString = function (contextstring)
