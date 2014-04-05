@@ -33,7 +33,7 @@ Analytics.prototype.initGoogleAnalytics = function()
 //------------------------------------------------------------------------------
 Analytics.prototype.trackEvent = function(category, action, label, value)
 {
-	if(!this.enabled || !this.ga)
+	if(!this.enabled || !ga)
 		return;
 	
 	ga('send', category, action, label, value);
@@ -41,37 +41,25 @@ Analytics.prototype.trackEvent = function(category, action, label, value)
 
 //------------------------------------------------------------------------------
 Analytics.prototype.returnToMenu = function()
-{
-	if(!this.enabled || !this.ga)
-		return;
-	
+{	
 	this.trackEvent("navigation", "menu");
 };
 
 //------------------------------------------------------------------------------
 Analytics.prototype.boardStart = function(levelNumOrSeed, isRandom, howLoaded)
-{
-	if(!this.enabled || !this.ga)
-		return;
-	
+{	
 	this.trackEvent("level", "start", (isRandom ? "Random" : "Level")+levelNumOrSeed + " Start - " + howLoaded);
 };
 
 //------------------------------------------------------------------------------
 Analytics.prototype.levelScore = function(levelNumOrSeed, isRandom, medalLevel, score)
-{
-	if(!this.enabled || !this.ga)
-		return;
-	
+{	
 	this.trackEvent("level", "complete", (isRandom ? "Random" : "Level")+levelNumOrSeed + " - " + ["none","bronze","silver","gold","super"][medalLevel], score);
 };
 
 //------------------------------------------------------------------------------
 Analytics.prototype.levelLost = function(levelNumOrSeed, isRandom)
 {
-	if(!this.enabled || !this.ga)
-		return;
-	
 	this.trackEvent("level", "lost", (isRandom ? "Random" : "Level")+levelNumOrSeed);
 };
 
