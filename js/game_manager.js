@@ -143,6 +143,8 @@ GameManager.prototype.setup = function ()
 	if(this.solver)
 		this.solver.cancel();
 
+	this.isMenu = false;
+	
 	// figureout how many medals the user has
 	this.medalCount = 0;
 	for(var i = 0; i < this.levels.length; ++i)
