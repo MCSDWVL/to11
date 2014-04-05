@@ -176,7 +176,7 @@ GameManager.prototype.setup = function ()
 	var level = (this.level != null && this.level != undefined) ? this.levels[this.level] : null;
 	if(level)
 	{
-		this.actuator.setMedalNumbers(level.gold, level.silver, level.bronze);
+		this.actuator.setMedalNumbers(level.gold, level.silver, level.bronze, true);
 		this.actuator.setContextString("Level " + (this.level + 1));
 	}
 	else
