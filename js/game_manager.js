@@ -273,7 +273,7 @@ GameManager.prototype.onSolverFindAnySolution = function (solver)
 		window.gm.actuate();
 		window.gm.actuator.setContextString("(Solving) Random - " + window.gm.initialSeed);
 		window.gm.loading = false;
-		window.analytics.boardStart(this.isRandom ? this.initialSeed : this.level+1, this.isRandom, this.setupInitBy);
+		window.analytics.boardStart(window.gm.isRandom ? window.gm.initialSeed : window.gm.level+1, window.gm.isRandom, window.gm.setupInitBy);
 	}
 };
 
