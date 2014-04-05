@@ -190,7 +190,10 @@ GameManager.prototype.setup = function ()
 		else if(this.customLevelString)
 		{
 			if(this.customLevelString == "XXXXXXXXXXXXXXXX") // Menu
+			{
+				this.isMenu = true;
 				this.actuator.setContextString("<strong class=\"important\">TOUCH A SQUARE TO PLAY LEVEL</strong>");
+			}
 			else
 				this.actuator.setContextString("Custom Level");
 		}
@@ -203,7 +206,8 @@ GameManager.prototype.setup = function ()
 		this.actuate();
 	}
 	
-	window.analytics.boardStart(this.isRandom ? this.initialSeed : this.level, this.isRandom, this.setupInitBy);
+	if(!this.isMenu && !this.isEditor)
+		window.analytics.boardStart(this.isRandom ? this.initialSeed : this.level, this.isRandom, this.setupInitBy);
 };
 
 // Set up the initial tiles to start the game with
