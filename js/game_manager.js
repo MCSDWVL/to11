@@ -206,10 +206,9 @@ GameManager.prototype.setup = function ()
 	if(!this.loading)
 	{
 		this.actuate();
+		if(!this.isMenu && !this.isEditor)
+			window.analytics.boardStart(this.isRandom ? this.initialSeed : this.level+1, this.isRandom, this.setupInitBy);
 	}
-	
-	if(!this.isMenu && !this.isEditor)
-		window.analytics.boardStart(this.isRandom ? this.initialSeed : this.level+1, this.isRandom, this.setupInitBy);
 };
 
 // Set up the initial tiles to start the game with
@@ -274,6 +273,7 @@ GameManager.prototype.onSolverFindAnySolution = function (solver)
 		window.gm.actuate();
 		window.gm.actuator.setContextString("(Solving) Random - " + window.gm.initialSeed);
 		window.gm.loading = false;
+		window.analytics.boardStart(this.isRandom ? this.initialSeed : this.level+1, this.isRandom, this.setupInitBy);
 	}
 };
 
