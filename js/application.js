@@ -27,6 +27,9 @@ window.onLevelSelect = function (level)
 
 window.showMainMenu = function ()
 {
+	// track event back to menu
+	window.analytics.returnToMenu();
+	
 	var size = 4;
 
 	// new empty board clears

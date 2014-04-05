@@ -80,6 +80,7 @@ function GameManager(size, InputManager, Actuator, StorageManager, seed, level, 
 	];
 	*/
 
+	this.setupInitBy = "Frontend";
 	this.setup();
 }
 
@@ -89,6 +90,7 @@ GameManager.prototype.restart = function ()
 	this.seed = this.initialSeed;
 	//this.storageManager.clearGameState();
 	this.actuator.continueGame(); // Clear the game won/lost message
+	this.setupInitBy = "Restart";
 	this.setup();
 };
 
@@ -103,6 +105,7 @@ GameManager.prototype.keepPlaying = function ()
 	this.seed = this.initialSeed;
 	//this.storageManager.clearGameState();
 	this.actuator.continueGame(); // Clear the game won/lost message
+	this.setupInitBy = "Continue";
 	this.setup();
 };
 
@@ -199,24 +202,30 @@ GameManager.prototype.setup = function ()
 	{
 		this.actuate();
 	}
+	
+	window.analytics.boardStart(this.isRandom ? this.initialSeed : this.level, this.isRandom, this.setupInitBy);
 };
 
 // Set up the initial tiles to start the game with
 GameManager.prototype.addStartTiles = function ()
 {
+	this.isLevel = this.isCustom = this.isRandom = false;
 	if(this.customLevelString != null && this.customLevelString != undefined)
 	{
+		this.isCustom = true;
 		this.loading = false;
 		this.populateGridFromSimpleString(this.customLevelString);
 	}
 	else if(this.level != null && this.level != undefined && !isNaN(this.level))
 	{
+		this.isLevel = true;
 		this.loading = false;
 		var levelString = this.levels[this.level].lvl;
 		this.populateGridFromSimpleString(levelString);
 	}
 	else
 	{
+		this.isRandom = true;
 		this.actuator.showLoadingMessage();
 		this.loading = true;
 		//this.actuate();
@@ -583,7 +592,10 @@ GameManager.prototype.move = function (direction)
 			this.addRandomTile();
 
 		if (!this.movesAvailable() || this.movesTaken > this.maxMovesCurrentLevel())
+		{
 			this.over = true; // Game over!
+			window.analytics.levelLost(this.isRandom ? this.intialSeed : this.level, this.isRandom);
+		}
 
 		if (this.winWhenSingleTile && this.singleTileLeft())
 		{
@@ -593,6 +605,7 @@ GameManager.prototype.move = function (direction)
 				this.storageManager.setBestMovesToComplete(this.levelIdentifier, this.movesTaken);
 			}
 			this.won = true; // Game over!
+			window.analytics.levelScore(this.isRandom ? this.initialSeed : this.level, this.isRandom, this.medalLevelForCurrentMovesAndLevel(), this.movesTaken);
 		}
 	}
 
@@ -804,22 +817,42 @@ GameManager.prototype.maxMovesCurrentLevel = function()
 GameManager.prototype.medalLevelForCurrentMovesAndLevel = function()
 {
 	var level = this.levels[this.level];
-	if(level == null || level == undefined)
-		return 0;
 	var bestMoves = this.movesTaken;
-	if(bestMoves == 0)
-		return 0;
-	else if(bestMoves < level.gold)
-		return 4;
-	else if(bestMoves == level.gold)
-		return 3;
-	else if(bestMoves <= level.silver)
-		return 2;
-	else if(bestMoves <= level.bronze)
-		return 1;
-	else
-		return 0;
+	if(this.solver)
+	{
+		var gold = this.solver.bestSolution.movesTaken.length
+		var silver = gold*2;
+		var bronze = gold*3;
+		if(bestMoves == 0)
+			return 0;
+		else if(bestMoves < gold)
+			return 4;
+		else if(bestMoves == gold)
+			return 3;
+		else if(bestMoves <= silver)
+			return 2;
+		else if(bestMoves <= bronze)
+			return 1;
+		else
+			return 0;
+	}
+	else if(level != null && level != undefined)
+	{
+		if(bestMoves == 0)
+			return 0;
+		else if(bestMoves < level.gold)
+			return 4;
+		else if(bestMoves == level.gold)
+			return 3;
+		else if(bestMoves <= level.silver)
+			return 2;
+		else if(bestMoves <= level.bronze)
+			return 1;
+		else
+			return 0;
+	}
 }
+
 
 GameManager.prototype.medalLevel = function(levelNum)
 {
