@@ -35,7 +35,8 @@ Analytics.prototype.trackEvent = function(category, action, label, value)
 {
 	if(!this.enabled || !ga)
 		return;
-	
+
+	console.log("tracking event send, category: " + category + ", action: " + action + ", label: " + label + ", value: " + value);
 	ga('send', category, action, label, value);
 };
 
