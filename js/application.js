@@ -21,6 +21,7 @@ window.onLevelSelect = function (level)
 		window.gm.level = level;
 		window.gm.customLevelString = null;
 		window.gm.editor = null;
+		window.gm.setupInitBy = "Frontend";
 		window.gm.setup();
 	}
 };
