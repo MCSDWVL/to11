@@ -66,18 +66,10 @@ KeyboardInputManager.prototype.listen = function ()
 			}
 		}
 
-		// R key does robot shit
+		// "R" key does robot shit
 		if (!modifiers && event.which === 82)
 		{
-			for (var i = 1; i < 10; ++i)
-			{
-				var solver = new Solver(window.gm.grid, i * 10);
-				if (solver.solved)
-				{
-					alert("done!");
-					break;
-				}
-			}
+			var solver = new Solver(window.gm.grid, 50);
 		}
 	});
 
