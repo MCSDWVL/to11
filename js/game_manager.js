@@ -606,6 +606,7 @@ GameManager.prototype.move = function (direction)
 
 	if (moved)
 	{
+		//
 		this.movesTaken++;
 		if (this.addTilesOnMove)
 			this.addRandomTile();
