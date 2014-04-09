@@ -498,6 +498,9 @@ GameManager.prototype.editorClick = function (data)
 		else
 			newValue = rightClick ? tile.value/2 : tile.value * 2;
 		
+		if(newValue > 2048)
+			newValue = 2048;
+		
 		// trying to remove a wall
 		if(newValue < 0)
 		{
@@ -724,8 +727,8 @@ GameManager.prototype.getGridAsSimpleString = function()
 {
 	var plainoutput = "";
 	for (var x = 0; x < this.grid.size; x++) 
-		for (var y = 0; y < this.grid.size; y++) 
-			plainoutput += this.grid.cells[x][y] ? (this.grid.cells[x][y].value == 0 ? 0 : Math.log(this.grid.cells[x][y].value) / Math.LN2 ) : "X";
+		for (var y = 0; y < this.grid.size; y++)
+			plainoutput += this.grid.cells[x][y] ? (this.grid.cells[x][y].value == 0 ? 0 : (Math.log(this.grid.cells[x][y].value) / Math.LN2).toString(16) ) : "X";
 	return plainoutput;
 };
 
@@ -757,7 +760,7 @@ GameManager.prototype.populateGridFromSimpleString = function(simpleString)
 	{
 		var pos = {x: Math.floor(i / this.grid.size), y: i % this.grid.size}; 
 		var char = simpleString.charAt(i);
-		var asInt = parseInt(char);
+		var asInt = parseInt(char,16);
 		if(isNaN(asInt))
 		{
 			continue;
