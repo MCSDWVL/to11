@@ -39,7 +39,7 @@ HTMLActuator.prototype.actuate = function (grid, metadata)
 
 		//self.updateScore(metadata.score);
 		//self.updateBestScore(metadata.bestScore);
-		self.updateBestScore(metadata.bestMoves);
+		self.updateBestScore(metadata.bestMoves, metadata.perfect);
 		self.updateHighest(metadata.highest, metadata.moves);
 		self.updateSeed(metadata.seed);
 		self.updateNextButton();
@@ -184,9 +184,14 @@ HTMLActuator.prototype.updateScore = function (score) {
   }
 };
 
-HTMLActuator.prototype.updateBestScore = function (bestScore) {
-  this.bestContainer.textContent = bestScore > 0 ? bestScore : "--";
- };
+HTMLActuator.prototype.updateBestScore = function (bestScore, perfect)
+{
+	console.log("Actuating best score with medal level " + this.medalLevel);
+	this.bestContainer.classList.remove("perfect");
+	this.bestContainer.textContent = bestScore > 0 ? bestScore : "--";
+	if (bestScore == perfect)
+		this.bestContainer.classList.add("perfect");
+};
 
 HTMLActuator.prototype.updateSeed = function (seed)
 {
@@ -216,12 +221,12 @@ HTMLActuator.prototype.showLoadingMessage = function (show)
 HTMLActuator.prototype.message = function (won)
 {
 	var type = won ? "game-won" : "game-over";
-	var message =  won ? "You win!" : "Game over!";
+	var message =  won ? "You win!" : "Too Many Moves!";
 
 	this.messageContainer.classList.add(type);
 	this.messageContainer.getElementsByTagName("p")[0].textContent = message;
 
-	var medalClass = ["none", "bronze", "silver", "gold","supermedal"][this.medalLevel];
+	var medalClass = won ? ["none", "bronze", "silver", "gold", "supermedal"][this.medalLevel] : "none";
 	this.messageContainer.getElementsByClassName("won-medal")[0].classList.add("large-medal");
 	this.messageContainer.getElementsByClassName("won-medal")[0].classList.add(medalClass);
 };

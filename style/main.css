@@ -94,6 +94,10 @@ h1.title {
 
 .best-container:after {
   content: "Best"; }
+.best-container.perfect:after 
+{
+	content: "Perfect";
+}
   
 .highest-container:after {
   content: "Highest"; }

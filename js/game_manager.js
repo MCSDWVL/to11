@@ -30,28 +30,28 @@ function GameManager(size, InputManager, Actuator, StorageManager, seed, level, 
 	this.inputManager.on("goToMenu", this.goToMenu.bind(this));
 	
 	this.levels = [		// Easy
-						{lvl: "0X65060566076XXX", gold:5+1, silver:15, bronze:20, price:0},			// 1
-						{lvl: "500X766X57005XX5", gold:8+1, silver:15, bronze:20, price:1},			// 2
-						{lvl: "4200XX05237X608X", gold:11+1, silver:25, bronze:30, price:2},		// 3
-						{lvl: "4524236470630347", gold:17+1, silver:20, bronze:40, price:3},		// 4
-						{lvl: "08570314X160011X", gold:14+1, silver:30, bronze:40, price:4},		// 5
-						{lvl: "XXX5X08X650006X6", gold:11+1, silver:15, bronze:20, price:5},		// 6
+						{lvl: "0X65060566076XXX", perfect:5, gold:5, silver:15, bronze:20, price:0},			// 1
+						{lvl: "500X766X57005XX5", perfect:8, gold:8, silver:15, bronze:20, price:1},			// 2
+						{lvl: "4200XX05237X608X", perfect:11, gold:11, silver:25, bronze:30, price:2},			// 3
+						{lvl: "4524236470630347", perfect:17, gold:17, silver:20, bronze:40, price:3},			// 4
+						{lvl: "08570314X160011X", perfect:14, gold:14, silver:30, bronze:40, price:4},			// 5
+						{lvl: "XXX5X08X650006X6", perfect:11, gold:11, silver:15, bronze:20, price:5},			// 6
 
 						// Medium
-						{lvl: "XX6084X407X0X50X", gold:10+1, silver:15, bronze:20, price:6},		// 7
-						{lvl: "6X4X006056505476", gold:16+1, silver:30, bronze:40, price:7},		// 8
-						{lvl: "1511021367637260", gold:17+1, silver:30, bronze:40, price:8},		// 9
-						{lvl: "6534660605125166", gold:13+1, silver:23, bronze:40, price:9},		// 10
-						{lvl: "0110515440170384", gold:18+1, silver:30, bronze:40, price:10},		// 11
+						{lvl: "XX6084X407X0X50X", perfect:10, gold:10, silver:15, bronze:20, price:6},			// 7
+						{lvl: "6X4X006056505476", perfect:16, gold:16, silver:30, bronze:40, price:7},			// 8
+						{lvl: "1511021367637260", perfect:17, gold:17+1, silver:30, bronze:40, price:8},		// 9
+						{lvl: "6534660605125166", perfect:13, gold:13+1, silver:23, bronze:40, price:9},		// 10
+						{lvl: "0110515440170384", perfect:18, gold:18+1, silver:30, bronze:40, price:10},		// 11
 
 						// Hard
-						{lvl: "1371466150057414", gold:23+1, silver:60, bronze:70, price:11},		// 12
-						{lvl: "5004630466043576", gold:21+1, silver:50, bronze:90, price:12},		// 13
-						{lvl: "00083X7XX50435X5", gold:13+1, silver:50, bronze:100, price:13},		// 14
-						{lvl: "1143053101533837", gold:16+1, silver:40, bronze:50, price:14},		// 15
+						{lvl: "1371466150057414", perfect:23, gold:23+1, silver:60, bronze:70, price:11},		// 12
+						{lvl: "5004630466043576", perfect:21, gold:21+1, silver:50, bronze:90, price:12},		// 13
+						{lvl: "00083X7XX50435X5", perfect:13, gold:13+1, silver:50, bronze:100, price:13},		// 14
+						{lvl: "1143053101533837", perfect:16, gold:16+1, silver:40, bronze:50, price:14},		// 15
 
 						// very hard
-						{lvl: "2X733600482300X4", gold:22+1, silver:90, bronze:100, price:30},	// 16
+						{lvl: "2X733600482300X4", perfect:22, gold:22+1, silver:90, bronze:100, price:30},	// 16
 
 						// debug
 						// {lvl: "XX11XXXXXXXXXXXX", gold:1, silver:3, bronze:5, price:30}		// X
@@ -445,6 +445,7 @@ GameManager.prototype.actuate = function () {
     terminated: this.isGameTerminated(),
 	moves: this.movesTaken,
 	highest: this.highestTileMade,
+	perfect: this.getPerfectScoreForCurrent(),
 	seed: this.initialSeed,
 	medalLevel: this.medalLevelForCurrentMovesAndLevel(),
   });
@@ -879,5 +880,19 @@ GameManager.prototype.medalLevel = function(levelNum)
 			return 1;
 		else
 			return 0;
+	}
+};
+
+GameManager.prototype.getPerfectScoreForCurrent = function()
+{
+	var level = this.levels[this.level];
+	var bestMoves = this.movesTaken;
+	if(this.solver)
+	{
+		return this.solver.bestSolution.movesTaken.length;
+	}
+	else if(level != null && level != undefined)
+	{
+		return level.perfect;
 	}
 };

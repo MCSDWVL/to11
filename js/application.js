@@ -63,7 +63,7 @@ window.showMainMenu = function ()
 			if (medalLevel > 0)
 			{
 				var medalWrapper = document.createElement("div");
-				var medalType = ["none", "bronze", "silver", "gold", "supermedal"][medalLevel];
+				var medalType = ["none", "bronze", "silver", "gold", "gold"][medalLevel];
 				medalWrapper.setAttribute("class", "small-medal " + medalType);
 				wrapper.appendChild(medalWrapper);
 			}
