@@ -45,13 +45,13 @@ function GameManager(size, InputManager, Actuator, StorageManager, seed, level, 
 						{lvl: "0110515440170384", perfect:18, gold:18+1, silver:30, bronze:40, price:10},		// 11
 
 						// Hard
-						{lvl: "1371466150057414", perfect:23, gold:23+1, silver:60, bronze:70, price:11},		// 12
-						{lvl: "5004630466043576", perfect:21, gold:21+1, silver:50, bronze:90, price:12},		// 13
-						{lvl: "00083X7XX50435X5", perfect:13, gold:13+1, silver:50, bronze:100, price:13},		// 14
-						{lvl: "1143053101533837", perfect:16, gold:16+1, silver:40, bronze:50, price:14},		// 15
+						//{lvl: "1371466150057414", perfect:23, gold:23+1, silver:60, bronze:70, price:11},		// 12
+						{lvl: "5004630466043576", perfect:21, gold:21+1, silver:50, bronze:90, price:12},		// 12 13
+						{lvl: "00083X7XX50435X5", perfect:13, gold:13+1, silver:50, bronze:100, price:13},		// 13 14
+						{lvl: "1143053101533837", perfect:16, gold:16+1, silver:40, bronze:50, price:14},		// 14 15
 
 						// very hard
-						{lvl: "2X733600482300X4", perfect:22, gold:22+1, silver:90, bronze:100, price:30},	// 16
+						{lvl: "2X733600482300X4", perfect:22, gold:22+1, silver:90, bronze:100, price:30},	// 15  16
 
 						// debug
 						// {lvl: "XX11XXXXXXXXXXXX", gold:1, silver:3, bronze:5, price:30}		// X
@@ -100,7 +100,7 @@ GameManager.prototype.keepPlaying = function ()
 	// ugly WTF javascrip uggghhhhh
 	if(!window.gm.currentLevelHasBeenBeaten())
 		return;
-	this.level = Math.min(this.levels.length-1, this.level + 1);
+	this.level = this.level + 1;
 	this.initialSeed++;
 	this.seed = this.initialSeed;
 	//this.storageManager.clearGameState();
@@ -137,6 +137,13 @@ GameManager.prototype.seededRandom = function ()
 // Set up the game
 GameManager.prototype.setup = function ()
 {
+	// afte rthe last level go into endless mode
+	if(this.level >= this.levels.length)
+	{
+		this.initialSeed = this.level - this.levels.length;
+		this.level = NaN;
+	}
+
 	var previousState = null; //this.storageManager.getGameState();
 
 	// shut down any solver that might be running

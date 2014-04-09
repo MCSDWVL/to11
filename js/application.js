@@ -57,7 +57,11 @@ window.showMainMenu = function ()
 				gridcells[i].removeChild(gridcells[i].firstChild);
 			var wrapper = document.createElement("div");
 			wrapper.setAttribute("class", "level-select");
-			wrapper.innerText = "LVL " + (i + 1);
+
+			if (i == 15)
+				wrapper.innerHTML = "LVL &infin;<br/>???";
+			else
+				wrapper.innerText = "LVL " + (i + 1);
 
 			var medalLevel = window.gm.medalLevel(i);
 			if (medalLevel > 0)
