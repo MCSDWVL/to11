@@ -173,7 +173,9 @@ Solver.prototype.solveIterativeStep = function ()
 
 	var haveNoSolution = this.bestSolution == null;
 	if (haveNoSolution && gCounter > this.probablyGiveUpCap && this.iterativeProbablyImpossibleCallback)
+	{
 		this.iterativeProbablyImpossibleCallback(this);
+	}
 
 	this.busy = false;
 };

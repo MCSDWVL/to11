@@ -94,11 +94,11 @@ GameManager.prototype.restart = function ()
 	this.setup();
 };
 
-// Keep playing after winning (allows going over 2048)
-GameManager.prototype.keepPlaying = function ()
+// move to next level
+GameManager.prototype.keepPlaying = function (force)
 {
 	// ugly WTF javascrip uggghhhhh
-	if(!window.gm.currentLevelHasBeenBeaten())
+	if(!window.gm.currentLevelHasBeenBeaten() && !force)
 		return;
 	this.level = this.level + 1;
 	this.initialSeed++;
@@ -264,13 +264,16 @@ GameManager.prototype.addStartTiles = function ()
 
 GameManager.prototype.onSolverProbablyGiveUp = function (solver)
 {
-	window.gm.keepPlaying();
+	window.gm.keepPlaying(true);
 };
 
 GameManager.prototype.onSolverFindAnySolution = function (solver)
 {
 	if(solver.bestSolution && solver.bestSolution.movesTaken)
-		window.gm.actuator.setMedalNumbers(solver.bestSolution.movesTaken.length, solver.bestSolution.movesTaken.length*2, solver.bestSolution.movesTaken.length*3, false);
+	{
+		var gold = solver.bestSolution.movesTaken.length+1;
+		window.gm.actuator.setMedalNumbers(gold, gold, gold, false);
+	}
 	else
 		window.gm.actuator.setMedalNumbers("--", "--", "--");
 
@@ -288,10 +291,11 @@ GameManager.prototype.onSolverFinished = function (solver)
 {
 	window.gm.actuator.setContextString("Random - " + window.gm.initialSeed);
 	if(!solver.bestSolution || !solver.bestSolution.movesTaken)
-		window.gm.keepPlaying();
+		window.gm.keepPlaying(true);
 	else
 	{
-		window.gm.actuator.setMedalNumbers(solver.bestSolution.movesTaken.length+1, solver.bestSolution.movesTaken.length*2, solver.bestSolution.movesTaken.length*3, true);
+		var gold = solver.bestSolution.movesTaken.length+1;
+		window.gm.actuator.setMedalNumbers(gold, gold, gold, true);
 		window.gm.loading = false;
 	}
 };
@@ -606,12 +610,6 @@ GameManager.prototype.move = function (direction)
 		if (this.addTilesOnMove)
 			this.addRandomTile();
 
-		if (!this.movesAvailable() || this.movesTaken > this.maxMovesCurrentLevel())
-		{
-			this.over = true; // Game over!
-			window.analytics.levelLost(this.isRandom ? this.intialSeed : this.level+1, this.isRandom);
-		}
-
 		if (this.winWhenSingleTile && this.singleTileLeft())
 		{
 			var bestMoves = this.storageManager.getBestMovesToComplete(this.levelIdentifier);
@@ -621,6 +619,11 @@ GameManager.prototype.move = function (direction)
 			}
 			this.won = true; // Game over!
 			window.analytics.levelScore(this.isRandom ? this.initialSeed : this.level+1, this.isRandom, this.medalLevelForCurrentMovesAndLevel(), this.movesTaken);
+		}
+		else if (!this.movesAvailable() || this.movesTaken >= this.maxMovesCurrentLevel())
+		{
+			this.over = true; // Game over!
+			window.analytics.levelLost(this.isRandom ? this.intialSeed : this.level+1, this.isRandom);
 		}
 	}
 
@@ -802,30 +805,43 @@ GameManager.prototype.price = function(levelNum)
 
 GameManager.prototype.currentLevelHasBeenBeaten = function()
 {
-	if(this.level == null || this.level == undefined || this.level < 0 || isNaN(this.level))
+	var bestMoves = this.storageManager.getBestMovesToComplete(this.levelIdentifier);
+
+	// if solver still solving
+	var fixedLevel = !(this.level == null || this.level == undefined || this.level < 0);
+
+	var medalLevel = 0;
+	if(fixedLevel)
 	{
-		return true;
+		medalLevel = this.medalLevel(this.level);
 	}
-	else
+	else if (this.solver)
 	{
-		var medalCount = this.medalLevel(this.level);
-		return this.medalLevel(this.level) > 0;
+		var gold = this.solver.bestSolution.movesTaken.length+1;
+		if(bestMoves <= gold)
+			medalLevel = 3;
 	}
+	
+	return medalLevel > 0;
 };
 
 GameManager.prototype.maxMovesCurrentLevel = function()
 {
-	if(this.level == null || this.level == undefined || this.level < 0)
+	if(this.level == null || this.level == undefined || this.level < 0 || isNaN(this.level))
 	{
-		return 1000000;
+		if(this.solver)
+		{
+			if(this.solver.bestSolution.movesTaken && this.solver.bestSolution.movesTaken.length > 0)
+				return this.solver.bestSolution.movesTaken.length+1;
+			else
+				return 1000;
+		}
 	}	
 	else
 	{
-		var level = (this.level != null && this.level != undefined) ? this.levels[this.level] : null;
+		var level = this.levels[this.level];
 		if(level)
 			return level.bronze;
-		else
-			return 1000000;
 	}
 };
 
@@ -836,8 +852,8 @@ GameManager.prototype.medalLevelForCurrentMovesAndLevel = function()
 	if(this.solver)
 	{
 		var gold = this.solver.bestSolution.movesTaken.length+1;
-		var silver = gold*2;
-		var bronze = gold*3;
+		var silver = gold;
+		var bronze = gold;
 		if(bestMoves == 0)
 			return 0;
 		else if(bestMoves < gold)
