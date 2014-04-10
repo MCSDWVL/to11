@@ -807,18 +807,21 @@ GameManager.prototype.price = function(levelNum)
 GameManager.prototype.currentLevelHasBeenBeaten = function()
 {
 	var bestMoves = this.storageManager.getBestMovesToComplete(this.levelIdentifier);
+	if(bestMoves == 0)
+		return false;
 
 	// if solver still solving
-	var fixedLevel = !(this.level == null || this.level == undefined || this.level < 0);
+	var fixedLevel = !(this.level == null || this.level == undefined || this.level < 0 || isNaN(this.level));
 
 	var medalLevel = 0;
 	if(fixedLevel)
 	{
 		medalLevel = this.medalLevel(this.level);
 	}
-	else if (this.solver)
+	else if (this.solver && this.solver.bestSolution)
 	{
 		var gold = this.solver.bestSolution.movesTaken.length+1;
+		console.log("a" + gold + " " + bestMoves);
 		if(bestMoves <= gold)
 			medalLevel = 3;
 	}
@@ -885,6 +888,15 @@ GameManager.prototype.medalLevelForCurrentMovesAndLevel = function()
 	}
 }
 
+GameManager.prototype.unlockAll = function()
+{
+	console.log("unlocking all");
+	for(var i = 0; i < window.gm.levels.length; ++i)
+	{
+		console.log(window.gm.levels[i].lvl);
+		window.gm.storageManager.setBestMovesToComplete(window.gm.levels[i].lvl, window.gm.levels[i].perfect);
+	}
+};
 
 GameManager.prototype.medalLevel = function(levelNum)
 {
@@ -911,7 +923,7 @@ GameManager.prototype.getPerfectScoreForCurrent = function()
 {
 	var level = this.levels[this.level];
 	var bestMoves = this.movesTaken;
-	if(this.solver)
+	if(this.solver && this.solver.bestSolution)
 	{
 		return this.solver.bestSolution.movesTaken.length;
 	}
@@ -919,4 +931,5 @@ GameManager.prototype.getPerfectScoreForCurrent = function()
 	{
 		return level.perfect;
 	}
+	else return 1;
 };

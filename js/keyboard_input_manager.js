@@ -71,6 +71,12 @@ KeyboardInputManager.prototype.listen = function ()
 		{
 			var solver = new Solver(window.gm.grid, 50);
 		}
+		
+		// "U" unlocks all levels
+		if(!modifiers && event.which == 85)
+		{
+			window.gm.unlockAll();
+		}
 	});
 
 	// Respond to button presses
