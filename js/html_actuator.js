@@ -252,7 +252,12 @@ HTMLActuator.prototype.setBoardString = function (gridString)
 
 HTMLActuator.prototype.setMedalNumbers = function (gold, silver, bronze, final)
 {
-	this.medalContainer.innerHTML = "<div class='small-medal gold " + (!final ? "counting" : "") + "'>" + gold + "</div><div class='small-medal silver " + (!final ? "counting" : "") + "'>" + silver + "</div><div class='small-medal bronze " + (!final ? "counting" : "") + "'>" + bronze + "</div>";
+	if(gold > 0)
+		this.medalContainer.innerHTML = "<div class='small-medal gold " + (!final ? "counting" : "") + "'>" + gold + "</div>";
+	if(silver > 0 && silver != gold)
+		this.medalContainer.innerHTML += "<div class='small-medal silver " + (!final ? "counting" : "") + "'>" + silver + "</div>"; 
+	if(bronze > 0 && bronze != gold)
+		this.medalContainer.innerHTML += "<div class='small-medal bronze " + (!final ? "counting" : "") + "'>" + bronze + "</div>";
 };
 
 HTMLActuator.prototype.setContextString = function (contextstring)
