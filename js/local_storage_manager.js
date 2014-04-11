@@ -23,6 +23,8 @@ function LocalStorageManager()
 	this.bestScoreKey = "bestScore";
 	this.bestMovesKey = "bestMoves";
 	this.gameStateKey     = "gameState";
+	this.highestRandomKey = "highestRandom";
+	this.totalRandomGoldKey = "totalRandomGold";
 
 	var supported = this.localStorageSupported();
 	this.storage = supported ? window.localStorage : window.fakeStorage;
@@ -79,7 +81,20 @@ LocalStorageManager.prototype.getHighestRandomCompleted = function ()
 
 LocalStorageManager.prototype.setHighestRandomCompleted = function (seed)
 {
+	var oldHighest = this.getHighestRandomCompleted();
+	if(seed > oldHighest)
+		this.setTotalRandomGold(parseInt(this.getTotalRandomGold())+1);
 	this.storage.setItem(this.highestRandomKey, seed);
+};
+
+LocalStorageManager.prototype.getTotalRandomGold = function ()
+{
+	return this.storage.getItem(this.totalRandomGoldKey) || 0;
+};
+
+LocalStorageManager.prototype.setTotalRandomGold = function (num)
+{
+	this.storage.setItem(this.totalRandomGoldKey, num);
 };
 
 

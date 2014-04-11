@@ -47,6 +47,9 @@ window.showMainMenu = function ()
 
 	// clear any game won/lost message
 	window.gm.actuator.continueGame();
+	
+	// clear medals
+	window.gm.actuator.setMedalNumbers(0,0,0,true);
 
 	var gridcells = document.getElementsByClassName("grid-cell");
 	for (var i = 0; i < gridcells.length; ++i)
@@ -59,7 +62,16 @@ window.showMainMenu = function ()
 			wrapper.setAttribute("class", "level-select");
 
 			if (i == 15)
-				wrapper.innerHTML = "LVL &infin;<br/>???";
+			{
+				var totalRandomGold = parseInt(window.gm.storageManager.getTotalRandomGold());
+				var cnt = totalRandomGold > 0 ? totalRandomGold : "???";
+				wrapper.innerHTML = "LVL &infin;";
+				
+				var medalWrapper = document.createElement("div");
+				medalWrapper.setAttribute("class", "small-medal " + (totalRandomGold>0?"gold":"none"));
+				wrapper.appendChild(medalWrapper);
+				medalWrapper.innerHTML = cnt;
+			}
 			else
 				wrapper.innerText = "LVL " + (i + 1);
 
