@@ -927,13 +927,14 @@ GameManager.prototype.getPerfectScoreForCurrent = function()
 {
 	var level = this.levels[this.level];
 	var bestMoves = this.movesTaken;
-	if(this.solver && this.solver.bestSolution)
-	{
-		return this.solver.bestSolution.movesTaken.length;
-	}
-	else if(level != null && level != undefined)
+	if(level != null && level != undefined)
 	{
 		return level.perfect;
 	}
+	else if(this.solver && this.solver.bestSolution)
+	{
+		return this.solver.bestSolution.movesTaken.length;
+	}
+	
 	else return 1;
 };
