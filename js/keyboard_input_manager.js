@@ -68,22 +68,54 @@ KeyboardInputManager.prototype.listen = function ()
 
 		// "R" key does robot shit
 		if (!modifiers && event.which === 82)
-		{
-			var solver = new Solver(window.gm.grid, 50);
-		}
-		
+			var solver = new Solver(window.gm.grid, 50, function (solver) { console.log(solver.movesTakenToHumanReadableString(solver.bestSolution.movesTaken, 4)); });
+
 		// "U" unlocks all levels
-		if(!modifiers && event.which == 85)
+		if (!modifiers && event.which == 85)
 		{
 			window.gm.unlockAll();
 		}
-		
+
 		// "DEL" clears local storage
-		if(!modifiers && event.which == 46)
+		if (!modifiers && event.which == 46)
 		{
 			var confirmed = window.confirm("Clear local storage?");
-			if(confirmed)
+			if (confirmed)
 				window.gm.storageManager.storage.clear();
+		}
+
+		// "P" generates first X presolved numbers
+		if (!modifiers && event.which == 80)
+		{
+			console.log("starting pre-solve");
+			var bakedString = "";
+			var startSeed = 0;
+			var maxPreSolve = 100;
+			var solveNext = function (solver)
+			{
+				var seed = startSeed;
+
+				if (solver)
+				{
+					seed = parseInt(solver.seedGeneratedWith) + 1;
+					bakedString += (solver.bestSolution ? solver.bestSolution.movesTaken.length : 0) + ",";
+					//if (solver.bestSolution)
+					//	console.log(solver.movesTakenToHumanReadableString(solver.bestSolution.movesTaken, 4));
+					console.log("So far " + bakedString);
+				}
+
+				if (seed < startSeed + maxPreSolve)
+				{
+					// new grid to solve
+					var grid = new Grid(window.gm.size);
+					window.gm.randomlyFillGrid(grid, seed);
+					var solver = new Solver(grid, 25, solveNext, null, null, seed);
+				}
+				else
+					console.log("done");
+			};
+
+			solveNext();
 		}
 	});
 

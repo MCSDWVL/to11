@@ -24,6 +24,8 @@ function GameManager(size, InputManager, Actuator, StorageManager, seed, level, 
 	this.highestTileMade = 0;
 	this.highestTileMadeAtMove = 0;
 
+	this.presolveManager = new PresolveManager(this.size, this.storageManager, this);
+
 	this.inputManager.on("move", this.move.bind(this));
 	this.inputManager.on("restart", this.restart.bind(this));
 	this.inputManager.on("keepPlaying", this.keepPlaying.bind(this));
@@ -77,7 +79,7 @@ GameManager.prototype.restart = function ()
 GameManager.prototype.keepPlaying = function (force)
 {
 	// ugly WTF javascrip uggghhhhh
-	if(!window.gm.currentLevelHasBeenBeaten() && !force)
+	if(!force && !window.gm.currentLevelHasBeenBeaten())
 		return;
 	this.level = this.level + 1;
 	this.initialSeed++;
@@ -221,7 +223,11 @@ GameManager.prototype.addStartTiles = function ()
 		this.actuator.showLoadingMessage();
 		this.loading = true;
 		
-		this.randomlyFillGrid(this.grid, this.seed);
+		this.randomlyFillGrid(this.grid, this.initialSeed);
+		
+		// solve it?
+		this.solver = new Solver(this.grid, 25, this.onSolverFinished, this.onSolverFindAnySolution, this.onSolverProbablyGiveUp, this.initialSeed);
+		console.log("gm solver initial seed " + this.initialSeed);	
 	}
 };
 
@@ -244,16 +250,13 @@ GameManager.prototype.randomlyFillGrid = function(grid, seed)
 	for (var i = 0; i < numWalls; ++i)
 		this.addRandomPosTileOfValue(0, grid);
 
-	// solve it?
-	this.solver = new Solver(this.grid, 25, this.onSolverFinished, this.onSolverFindAnySolution, this.onSolverProbablyGiveUp);		
-
 	// restore seed
 	this.seed = seedWas;
 };
 
 GameManager.prototype.onSolverProbablyGiveUp = function (solver)
 {
-	window.gm.keepPlaying(true);
+	//window.gm.keepPlaying(true);
 };
 
 GameManager.prototype.onSolverFindAnySolution = function (solver)
@@ -279,13 +282,19 @@ GameManager.prototype.onSolverFindAnySolution = function (solver)
 GameManager.prototype.onSolverFinished = function (solver)
 {
 	window.gm.actuator.setContextString("Random - " + window.gm.initialSeed);
-	if(!solver.bestSolution || !solver.bestSolution.movesTaken)
+	if(!solver.bestSolution || !solver.bestSolution.movesTaken || solver.bestSolution.movesTaken.length == 0)
+	{
+		window.gm.solver = null;
 		window.gm.keepPlaying(true);
+	}
 	else
 	{
 		var gold = solver.bestSolution.movesTaken.length+1;
 		window.gm.actuator.setMedalNumbers(gold, gold, gold, true);
 		window.gm.loading = false;
+
+		// pre-solve the next one
+		//window.gm.preSolve(window.gm.initialSeed + 1);
 	}
 };
 
@@ -612,6 +621,7 @@ GameManager.prototype.move = function (direction)
 			if(this.isInfinity)
 			{
 				this.storageManager.setHighestRandomCompleted(this.initialSeed);
+				this.presolveManager.onUserHighestInfinityChanges();
 			}
 			this.won = true; // Game over!
 			window.analytics.levelScore(this.isRandom ? this.initialSeed : this.level+1, this.isRandom, this.medalLevelForCurrentMovesAndLevel(), this.movesTaken);
@@ -807,7 +817,7 @@ GameManager.prototype.currentLevelHasBeenBeaten = function()
 
 	// if solver still solving
 	var fixedLevel = !(this.level == null || this.level == undefined || this.level < 0 || isNaN(this.level));
-
+	console.log(fixedLevel);
 	var medalLevel = 0;
 	if(fixedLevel)
 	{
@@ -815,12 +825,13 @@ GameManager.prototype.currentLevelHasBeenBeaten = function()
 	}
 	else if (this.solver && this.solver.bestSolution)
 	{
+		console.log("LET ME WIN " + this.solver.bestSolution.movesTaken.length + " " + this.solver.seedGeneratedWith + " " + this.solver.startingBoardString);
 		var gold = this.solver.bestSolution.movesTaken.length+1;
-		console.log("a" + gold + " " + bestMoves);
 		if(bestMoves <= gold)
 			medalLevel = 3;
 	}
 	
+	console.log("beaten? " + medalLevel + "X" + this.solver + "Y" + this.solver.bestSolution);
 	return medalLevel > 0;
 };
 

@@ -140,4 +140,13 @@ Grid.prototype.serialize = function () {
     size: this.size,
     cells: cellState
   };
+ };
+
+Grid.prototype.asSimpleString = function ()
+{
+	var plainoutput = "";
+	for (var x = 0; x < this.size; x++)
+		for (var y = 0; y < this.size; y++)
+			plainoutput += this.cells[x][y] ? (this.cells[x][y].value == 0 ? 0 : Math.log(this.cells[x][y].value) / Math.LN2) : "X";
+	return plainoutput;
 };

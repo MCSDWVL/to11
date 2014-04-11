@@ -2,46 +2,33 @@
 
 var gCounter = 0;
 var gKnownSolutions = {};
-function Solver(grid, maxMoves, finishCallback, newBestCallback, probablyImpossibleCallback)
+
+//-----------------------------------------------------------------------------
+function Solver(grid, maxMoves, finishCallback, newBestCallback, probablyImpossibleCallback, seed)
 {
 	if(maxMoves == null || maxMoves == undefined || maxMoves <= 0 || isNaN(maxMoves))
 		maxMoves = 50;
 
-	this.probablyGiveUpCap = 1000;
+	this.probablyGiveUpCap = 5000;
 	this.startingBoardString = this.getGridAsSimpleString(grid);
+	console.log("Starting solver for " + this.startingBoardString + " " + seed);
 	this.grid = grid;
 	this.maxMoves = maxMoves;
 	this.bestMovesSoFar = maxMoves;
 	this.solved = false;
 	this.visitedDictionary = {};
 	this.needEvaluation = [];
-	this.bestSolution = null;
+	this.bestSolution = { movesTaken: [] };
 	this.busy = false;
+	this.seedGeneratedWith = seed;
 
 	this.iterativeFinishedCallback = finishCallback;
 	this.iterativeNewBestCallback = newBestCallback;
 	this.iterativeProbablyImpossibleCallback = probablyImpossibleCallback;
 	this.solveIterativeSetup(grid);
-
-	/*
-	var solution = this.solveRecursive(grid, []);
-	console.log("Solved in " + solution.moves.length + ": " + solution.solved);
-	var solveString = "";
-	for (var i = 0; i < solution.moves.length; ++i)
-	{
-		if (i != 0 && i % 4 == 0)
-			solveString += " ";
-		solveString += ["U", "R", "D", "L"][solution.moves[i]];
-	}
-
-
-
-	this.solved = solution.solved;
-	this.solutionMoves = solution.moves;
-	
-	console.log(solveString);*/
 };
 
+//-----------------------------------------------------------------------------
 Solver.prototype.movesTakenToHumanReadableString = function (movesTaken, divideCounter)
 {
 	if (isNaN(divideCounter))
@@ -56,6 +43,7 @@ Solver.prototype.movesTakenToHumanReadableString = function (movesTaken, divideC
 	return solveString;
 }
 
+//-----------------------------------------------------------------------------
 Solver.prototype.cancel = function ()
 {
 	if (this.solveIterator)
@@ -63,28 +51,41 @@ Solver.prototype.cancel = function ()
 	this.solveIterator = null;
 };
 
+//-----------------------------------------------------------------------------
 Solver.prototype.solveIterativeSetup = function (startingGrid)
 {
 	gCounter = 0;
+	
+	this.addAllNextSolutions(startingGrid, [], startingGrid.cellsOccupied());
+	this.solveIterator = setInterval((function (self) { return function () { self.solveIterativeStep(); } })(this), 1);
+};
+
+//-----------------------------------------------------------------------------
+Solver.prototype.doInitialKnownSolutionCheck = function ()
+{
 	if (gKnownSolutions[this.startingBoardString])
 	{
 		this.bestSolution = gKnownSolutions[this.startingBoardString];
-		if (this.iterativeNewBestCallback)
+		if (!this.bestSolution.movesTaken || this.bestSolution.movesTaken.length == 0)
+		{
+			if (this.iterativeProbablyImpossibleCallback)
+				this.iterativeProbablyImpossibleCallback(this);
+		}
+		else if (this.iterativeNewBestCallback)
+		{
 			this.iterativeNewBestCallback(this);
+		}
+
 		this.solveIterativeFinish();
-	}
-	else
-	{
-		this.addAllNextSolutions(startingGrid, [], startingGrid.cellsOccupied());
-		this.solveIterator = setInterval((function (self) { return function () { self.solveIterativeStep(); } })(this), 1);
+		return true;
 	}
 };
 
+//-----------------------------------------------------------------------------
 Solver.prototype.solveIterativeFinish = function ()
 {
 	clearInterval(this.solveIterator);
 	this.solveIterator = null;
-	console.log("finish!");
 
 	gKnownSolutions[this.startingBoardString] = this.bestSolution;
 
@@ -92,11 +93,23 @@ Solver.prototype.solveIterativeFinish = function ()
 		this.iterativeFinishedCallback(this);
 };
 
+//-----------------------------------------------------------------------------
 Solver.prototype.solveIterativeStep = function ()
 {
 	if (this.busy)
 		return false;
 	this.busy = true;
+
+	// first update check stuff
+	if (gCounter == 0)
+	{
+		var haveKnownSolution = this.doInitialKnownSolutionCheck();
+		if (haveKnownSolution)
+		{
+			this.busy = false;
+			return;
+		}
+	}
 
 	// sort the solutions to eval by....
 	if (this.needEvaluation && this.needEvaluation.length > 0)
@@ -145,9 +158,9 @@ Solver.prototype.solveIterativeStep = function ()
 		// check if this is a solution!?
 		if (this.singleTileLeft(grid))
 		{
-			if (this.bestSolution == null || (movesTaken.length < this.bestSolution.movesTaken.length))
+			if (!this.bestSolution || !this.bestSolution.movesTaken || this.bestSolution.movesTaken.length == 0 || (movesTaken.length < this.bestSolution.movesTaken.length))
 			{
-				console.log(gCounter + " found new best solution " + this.movesTakenToHumanReadableString(solutionToEval.movesTaken, 4));
+				//console.log(gCounter + " found new best solution " + this.movesTakenToHumanReadableString(solutionToEval.movesTaken, 4));
 				this.bestMovesSoFar = solutionToEval.movesTaken.length;
 				this.bestSolution = solutionToEval;
 
@@ -171,10 +184,12 @@ Solver.prototype.solveIterativeStep = function ()
 		this.addAllNextSolutions(grid, movesTaken, solutionToEval.tileCount);
 	}
 
-	var haveNoSolution = this.bestSolution == null;
-	if (haveNoSolution && gCounter > this.probablyGiveUpCap && this.iterativeProbablyImpossibleCallback)
+	var haveNoSolution = this.bestSolution == null || this.bestSolution.movesTaken == null || this.bestSolution.movesTaken.length == 0;
+	if (haveNoSolution && gCounter > this.probablyGiveUpCap)
 	{
-		this.iterativeProbablyImpossibleCallback(this);
+		if (this.iterativeProbablyImpossibleCallback)
+			this.iterativeProbablyImpossibleCallback(this);
+		this.solveIterativeFinish();
 	}
 
 	this.busy = false;
@@ -260,8 +275,8 @@ Solver.prototype.solveRecursive = function (grid, movesTaken)
 			// is it a better solution?
 			if (!bestSolution.solved || solution.moves.length < bestSolution.moves.length)
 			{
-				if (this.bestMovesSoFar == this.maxMoves)
-					console.log("Got first solution! " + solution.moves.length);
+				//if (this.bestMovesSoFar == this.maxMoves)
+				//	console.log("Got first solution! " + solution.moves.length);
 				bestSolution.solved = true;
 				bestSolution.moves = solution.moves.slice(0);
 				if (bestSolution.moves.length < this.bestMovesSoFar)
