@@ -261,7 +261,7 @@ GameManager.prototype.addStartTiles = function ()
 		var numWalls = Math.round(4 + this.seededRandom()*2);
 		for (var i = 0; i < numWalls; ++i)
 			this.addRandomPosTileOfValue(0);
-		this.solver = new Solver(this.grid, 50, this.onSolverFinished, this.onSolverFindAnySolution, this.onSolverProbablyGiveUp);		
+		this.solver = new Solver(this.grid, 25, this.onSolverFinished, this.onSolverFindAnySolution, this.onSolverProbablyGiveUp);		
 	}
 };
 
