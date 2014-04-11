@@ -629,6 +629,10 @@ hr {
   text-align: center;
 }
 
+.promo {
+  text-align: center;
+}
+
 @media screen and (max-width: 520px) {
   html, body {
     font-size: 15px; }
