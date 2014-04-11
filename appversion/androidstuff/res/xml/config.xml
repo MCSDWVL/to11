@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="io.github.mcsdwvl.to11" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <preference name="loglevel" value="DEBUG" />
+    <feature name="App">
+        <param name="android-package" value="org.apache.cordova.App" />
+    </feature>
+    <name>to11</name>
+    <description>
+        to11 is a puzzle game based on 2048
+    </description>
+    <author email="matthew.vassilakos@gmail.com" href="http://mcsdwvl.github.io">
+        Matthew Vassilakos
+    </author>
+    <content src="index.html" />
+    <access origin="*" />
+</widget>
