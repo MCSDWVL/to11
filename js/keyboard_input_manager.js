@@ -77,6 +77,14 @@ KeyboardInputManager.prototype.listen = function ()
 		{
 			window.gm.unlockAll();
 		}
+		
+		// "DEL" clears local storage
+		if(!modifiers && event.which == 46)
+		{
+			var confirmed = window.confirm("Clear local storage?");
+			if(confirmed)
+				window.gm.storageManager.storage.clear();
+		}
 	});
 
 	// Respond to button presses
