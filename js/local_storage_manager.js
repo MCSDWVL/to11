@@ -72,5 +72,17 @@ LocalStorageManager.prototype.setBestMovesToComplete = function (identifier, mov
 	this.storage.setItem(this.bestMovesKey + (identifier ? identifier : "X"), moves);
 };
 
+LocalStorageManager.prototype.getHighestRandomCompleted = function ()
+{
+	return this.storage.getItem(this.highestRandomKey) || 0;
+};
+
+LocalStorageManager.prototype.setHighestRandomCompleted = function (seed)
+{
+	this.storage.setItem(this.highestRandomKey, seed);
+};
+
+
+
 
 

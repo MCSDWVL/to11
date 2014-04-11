@@ -140,7 +140,7 @@ GameManager.prototype.setup = function ()
 	// afte rthe last level go into endless mode
 	if(this.level >= this.levels.length)
 	{
-		this.initialSeed = this.level - this.levels.length;
+		this.initialSeed = parseInt(this.storageManager.getHighestRandomCompleted())+1;
 		this.level = NaN;
 	}
 
@@ -617,6 +617,10 @@ GameManager.prototype.move = function (direction)
 			if(bestMoves > this.movesTaken || bestMoves == 0)
 			{
 				this.storageManager.setBestMovesToComplete(this.levelIdentifier, this.movesTaken);
+			}
+			if(this.isRandom)
+			{
+				this.storageManager.setHighestRandomCompleted(this.initialSeed);
 			}
 			this.won = true; // Game over!
 			window.analytics.levelScore(this.isRandom ? this.initialSeed : this.level+1, this.isRandom, this.medalLevelForCurrentMovesAndLevel(), this.movesTaken);
