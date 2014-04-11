@@ -860,7 +860,22 @@ GameManager.prototype.medalLevelForCurrentMovesAndLevel = function()
 {
 	var level = this.levels[this.level];
 	var bestMoves = this.movesTaken;
-	if(this.solver)
+	if(level != null && level != undefined)
+	{
+		if(bestMoves == 0)
+			return 0;
+		else if(bestMoves < level.gold)
+			return 4;
+		else if(bestMoves == level.gold)
+			return 3;
+		else if(bestMoves <= level.silver)
+			return 2;
+		else if(bestMoves <= level.bronze)
+			return 1;
+		else
+			return 0;
+	}
+	else if(this.solver && this.solver.bestSolution)
 	{
 		var gold = this.solver.bestSolution.movesTaken.length+1;
 		var silver = gold;
@@ -878,21 +893,8 @@ GameManager.prototype.medalLevelForCurrentMovesAndLevel = function()
 		else
 			return 0;
 	}
-	else if(level != null && level != undefined)
-	{
-		if(bestMoves == 0)
-			return 0;
-		else if(bestMoves < level.gold)
-			return 4;
-		else if(bestMoves == level.gold)
-			return 3;
-		else if(bestMoves <= level.silver)
-			return 2;
-		else if(bestMoves <= level.bronze)
-			return 1;
-		else
-			return 0;
-	}
+	else
+		return 0;
 }
 
 GameManager.prototype.unlockAll = function()
