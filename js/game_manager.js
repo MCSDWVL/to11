@@ -59,29 +59,6 @@ function GameManager(size, InputManager, Actuator, StorageManager, seed, level, 
 						// {lvl: "XX11XXXXXXXXXXXX", gold:1, silver:3, bronze:5, price:30}		// X
 				];
 
-	/*
-	this.levels = [		[[0,null,64,32],[0,64,0,32],[64,64,0,128],[64,null,null,null]],			// 0X65060566076XXX very easy < 10	
-						[[null,null,null,32],[null,0,256,null],[64,32,0,0],[0,64,null,64]], 	// XXX5X08X650006X6 easy ~ 10		
-						[[32,0,0,null],[128,64,64,null],[32,128,0,0],[32,null,null,32]],		// 500X766X57005XX5 easy ~ 10
-						[[0,16,64,0],[null,null,0,null],[null,16,0,null]],						// ??? broken easy ~ 20
-						[[16,32,4,16],[4,8,64,16],[128,0,64,8],[0,8,16,128]],					// 4524236470630347 easy ~ 20
-						[[0,256,32,128],[0,8,2,16],[null,2,64,0],[0,2,2,null]],					// 08570314X160011X easy ~ 30
-						
-						[[null,null,64,0],[256,16,null,16],[0,128,null,0],[null,32,0,null]], 	//  medium ~ 10 to optimize
-						[[64,null,16,null],[0,0,64,0],[32,64,32,0],[32,16,128,64]],				//  medium ~ 30
-						[[2,32,2,2],[0,4,2,8],[64,128,64,8],[128,4,64,0]],						//  medium ~ 45
-						[[64,32,8,16],[64,64,0,64],[0,32,2,4],[32,2,64,64]],					//  medium ~ 
-						[[0,2,2,0],[32,2,32,16],[16,0,2,128],[0,8,256,16]],						//  medium ~ 
-						
-						[[2,8,128,2],[16,64,64,2],[32,0,0,32],[128,16,2,16]],					//  hard ~ 50
-						[[32,0,0,16],[64,8,0,16],[64,64,0,16],[8,32,128,64]],					//  hard ~ 70
-						[[0,0,0,256],[8,null,128,null],[null,32,0,16],[8,32,null,32]],			//  hard ~ 85
-						[[2,2,16,8],[0,32,8,2],[0,2,32,8],[8,256,8,128]],						//  hard ~ 35 can get stuck
-						
-						[[4,null,128,8],[8,64,0,0],[16,256,4,8],[0,0,null,16]]					//  very hard ~ 90 through random button
-	];
-	*/
-
 	this.setupInitBy = "Frontend";
 	this.setup();
 }
@@ -243,26 +220,35 @@ GameManager.prototype.addStartTiles = function ()
 		this.isRandom = true;
 		this.actuator.showLoadingMessage();
 		this.loading = true;
-		//this.actuate();
-		//var added = this.addTilesToMeetBudget(this.startingBudget);
-
-		// gut feeling that odd numbered tiles create more traps, ensure even number
-		//if (added % 2 != 0)
-		//	this.findLowestSplittableTileAndSplit();
-
-		// at least 7 tiles, at most 16
-		var tilesToAdd = Math.floor(this.seededRandom() * 16); 
-		if(tilesToAdd < 7)
-			tilesToAdd = 7;
-
-		this.addTilesToMeetFillCount(tilesToAdd);
-
-		// 4, 5, or 6 walls
-		var numWalls = Math.round(4 + this.seededRandom()*2);
-		for (var i = 0; i < numWalls; ++i)
-			this.addRandomPosTileOfValue(0);
-		this.solver = new Solver(this.grid, 25, this.onSolverFinished, this.onSolverFindAnySolution, this.onSolverProbablyGiveUp);		
+		
+		this.randomlyFillGrid(this.grid, this.seed);
 	}
+};
+
+GameManager.prototype.randomlyFillGrid = function(grid, seed)
+{
+	// save what seed was
+	var seedWas = seed;
+
+	// set seed to param
+	this.seed = seed;
+
+	// at least 7 tiles, at most 16
+	var tilesToAdd = Math.floor(7 + this.seededRandom() * 9); 
+
+	// ad
+	this.addTilesToMeetFillCount(tilesToAdd, grid);
+
+	// 4, 5, or 6 walls
+	var numWalls = Math.round(4 + this.seededRandom()*2);
+	for (var i = 0; i < numWalls; ++i)
+		this.addRandomPosTileOfValue(0, grid);
+
+	// solve it?
+	this.solver = new Solver(this.grid, 25, this.onSolverFinished, this.onSolverFindAnySolution, this.onSolverProbablyGiveUp);		
+
+	// restore seed
+	this.seed = seedWas;
 };
 
 GameManager.prototype.onSolverProbablyGiveUp = function (solver)
@@ -332,7 +318,7 @@ GameManager.prototype.findLowestSplittableTileAndSplit = function ()
 	}
 };
 
-GameManager.prototype.addTilesToMeetFillCount = function (fillCount)
+GameManager.prototype.addTilesToMeetFillCount = function (fillCount, grid)
 {
 	// start with just 1 tile
 	var valuesGonnaAdd = [512];
@@ -361,11 +347,11 @@ GameManager.prototype.addTilesToMeetFillCount = function (fillCount)
 
 	// add the non-twos
 	for(var i = 0; i < valuesGonnaAdd.length; ++i)
-		this.addRandomPosTileOfValue(valuesGonnaAdd[i]);
+		this.addRandomPosTileOfValue(valuesGonnaAdd[i], grid);
 
 	// add the twos
 	for(var i = 0; i < numTwos; ++i)
-		this.addRandomPosTileOfValue(2);
+		this.addRandomPosTileOfValue(2, grid);
 };
 
 GameManager.prototype.addTilesToMeetBudget = function (budget)
@@ -388,13 +374,15 @@ GameManager.prototype.addTilesToMeetBudget = function (budget)
 	}
 };
 
-GameManager.prototype.addRandomPosTileOfValue = function (value)
+GameManager.prototype.addRandomPosTileOfValue = function (value, grid)
 {
-	var pos = this.grid.randomAvailableCell(this.seededRandom());
+	if(!grid)
+		grid = this.grid;
+	var pos = grid.randomAvailableCell(this.seededRandom());
 	if(pos)
 	{
 		var tile = new Tile(pos, value);
-		this.grid.insertTile(tile);
+		grid.insertTile(tile);
 	}
 };
 

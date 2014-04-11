@@ -186,7 +186,6 @@ HTMLActuator.prototype.updateScore = function (score) {
 
 HTMLActuator.prototype.updateBestScore = function (bestScore, perfect)
 {
-	console.log(bestScore + " " + perfect);
 	this.bestContainer.classList.remove("perfect");
 	this.bestContainer.textContent = bestScore > 0 ? bestScore : "--";
 	if (bestScore == perfect)
