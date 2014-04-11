@@ -29,6 +29,8 @@ function GameManager(size, InputManager, Actuator, StorageManager, seed, level, 
 	this.inputManager.on("keepPlaying", this.keepPlaying.bind(this));
 	this.inputManager.on("goToMenu", this.goToMenu.bind(this));
 	
+	this.isInfinity = false;
+	
 	this.levels = [		// Easy
 						{lvl: "0X65060566076XXX", perfect:5, gold:5, silver:15, bronze:20, price:0},			// 1
 						{lvl: "500X766X57005XX5", perfect:8, gold:8, silver:15, bronze:20, price:1},			// 2
@@ -141,6 +143,7 @@ GameManager.prototype.setup = function ()
 	if(this.level >= this.levels.length)
 	{
 		this.initialSeed = parseInt(this.storageManager.getHighestRandomCompleted())+1;
+		this.isInfinity = true;
 		this.level = NaN;
 	}
 
@@ -618,7 +621,7 @@ GameManager.prototype.move = function (direction)
 			{
 				this.storageManager.setBestMovesToComplete(this.levelIdentifier, this.movesTaken);
 			}
-			if(this.isRandom)
+			if(this.isInfinity)
 			{
 				this.storageManager.setHighestRandomCompleted(this.initialSeed);
 			}
