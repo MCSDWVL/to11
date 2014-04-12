@@ -6,7 +6,7 @@ var gSolutionSeparator = ".";
 //-----------------------------------------------------------------------------
 function PresolveManager(size, StorageManager, GameManager)
 {
-	this.infinityStorageRange = 20;
+	this.infinityStorageRange = 100;
 	this.storageManager = StorageManager;
 	this.gameManager = GameManager;
 	this.preSolvedLevelsQueue = [];
@@ -15,7 +15,7 @@ function PresolveManager(size, StorageManager, GameManager)
 	// load the known solutions from storage manager
 	// parse the loaded string and add to global known solutions
 	var bigString = this.storageManager.getPresolvedRandomsLongString();
-	console.log("psm: big string " + bigString);
+	//console.log("psm: big string " + bigString);
 	this.convertAllPreSolvedStringToSolutionsAndAddToKnownSolutions(bigString);
 
 	if (!this.preSolvedLevelsQueue || this.preSolvedLevelsQueue.length == 0)
@@ -52,7 +52,7 @@ PresolveManager.prototype.convertAllPreSolvedStringToSolutionsAndAddToKnownSolut
 		{
 			var solution = this.convertPreSolvedStringToSolution(solutionStringPieces[i]);
 			this.preSolvedLevelsQueue.push(solution);
-			console.log("psm: adding solution to known " + solution.seed + " " + solution.board + " " + solution.movesTaken.length);
+			//console.log("psm: adding solution to known " + solution.seed + " " + solution.board + " " + solution.movesTaken.length);
 			gKnownSolutions[solution.board] = { movesTaken: solution.movesTaken };
 		}
 	}
@@ -167,6 +167,8 @@ PresolveManager.prototype.onLevelSolved = function (solver)
 	{
 		this.preSolve(seed + 1);
 	}
+	else
+		console.log("Done pre-solving for now!");
 };
 
 //-----------------------------------------------------------------------------

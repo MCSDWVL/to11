@@ -227,7 +227,6 @@ GameManager.prototype.addStartTiles = function ()
 		
 		// solve it?
 		this.solver = new Solver(this.grid, 25, this.onSolverFinished, this.onSolverFindAnySolution, this.onSolverProbablyGiveUp, this.initialSeed);
-		console.log("gm solver initial seed " + this.initialSeed);	
 	}
 };
 
@@ -240,7 +239,9 @@ GameManager.prototype.randomlyFillGrid = function(grid, seed)
 	this.seed = seed;
 
 	// at least 7 tiles, at most 16
-	var tilesToAdd = Math.floor(7 + this.seededRandom() * 9); 
+	var tilesToAdd = Math.floor(this.seededRandom() * 16); 
+	if(tilesToAdd < 7)
+		tilesToAdd = 7;
 
 	// ad
 	this.addTilesToMeetFillCount(tilesToAdd, grid);
@@ -817,7 +818,6 @@ GameManager.prototype.currentLevelHasBeenBeaten = function()
 
 	// if solver still solving
 	var fixedLevel = !(this.level == null || this.level == undefined || this.level < 0 || isNaN(this.level));
-	console.log(fixedLevel);
 	var medalLevel = 0;
 	if(fixedLevel)
 	{
@@ -825,13 +825,11 @@ GameManager.prototype.currentLevelHasBeenBeaten = function()
 	}
 	else if (this.solver && this.solver.bestSolution)
 	{
-		console.log("LET ME WIN " + this.solver.bestSolution.movesTaken.length + " " + this.solver.seedGeneratedWith + " " + this.solver.startingBoardString);
 		var gold = this.solver.bestSolution.movesTaken.length+1;
 		if(bestMoves <= gold)
 			medalLevel = 3;
 	}
 	
-	console.log("beaten? " + medalLevel + "X" + this.solver + "Y" + this.solver.bestSolution);
 	return medalLevel > 0;
 };
 
