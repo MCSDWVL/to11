@@ -1,6 +1,5 @@
 "use strict";
 
-var gCounter = 0;
 var gKnownSolutions = {};
 
 //-----------------------------------------------------------------------------
@@ -9,6 +8,7 @@ function Solver(grid, maxMoves, finishCallback, newBestCallback, probablyImpossi
 	if(maxMoves == null || maxMoves == undefined || maxMoves <= 0 || isNaN(maxMoves))
 		maxMoves = 50;
 
+	this.counter = 0;
 	this.probablyGiveUpCap = 5000;
 	this.startingBoardString = this.getGridAsSimpleString(grid);
 	console.log("Starting solver for " + this.startingBoardString + " " + seed);
@@ -54,7 +54,7 @@ Solver.prototype.cancel = function ()
 //-----------------------------------------------------------------------------
 Solver.prototype.solveIterativeSetup = function (startingGrid)
 {
-	gCounter = 0;
+	this.counter = 0;
 	
 	this.addAllNextSolutions(startingGrid, [], startingGrid.cellsOccupied());
 	this.solveIterator = setInterval((function (self) { return function () { self.solveIterativeStep(); } })(this), 1);
@@ -65,6 +65,7 @@ Solver.prototype.doInitialKnownSolutionCheck = function ()
 {
 	if (gKnownSolutions[this.startingBoardString])
 	{
+		console.log("known best for " + this.startingBoardString + " " + gKnownSolutions[this.startingBoardString].movesTaken.length);
 		this.bestSolution = gKnownSolutions[this.startingBoardString];
 		if (!this.bestSolution.movesTaken || this.bestSolution.movesTaken.length == 0)
 		{
@@ -84,6 +85,7 @@ Solver.prototype.doInitialKnownSolutionCheck = function ()
 //-----------------------------------------------------------------------------
 Solver.prototype.solveIterativeFinish = function ()
 {
+	console.log("Finished with " + this.startingBoardString + "(" + this.seedGeneratedWith +") in " + this.bestSolution.movesTaken.length);
 	clearInterval(this.solveIterator);
 	this.solveIterator = null;
 
@@ -101,7 +103,7 @@ Solver.prototype.solveIterativeStep = function ()
 	this.busy = true;
 
 	// first update check stuff
-	if (gCounter == 0)
+	if (this.counter == 0)
 	{
 		var haveKnownSolution = this.doInitialKnownSolutionCheck();
 		if (haveKnownSolution)
@@ -130,7 +132,7 @@ Solver.prototype.solveIterativeStep = function ()
 	var solutionsToCheckPerIter = 10;
 	for (var soli = 0; soli < solutionsToCheckPerIter; ++soli)
 	{
-		gCounter++;
+		this.counter++;
 
 		// no more solutions to check!?
 		if (!(this.needEvaluation && this.needEvaluation.length > 0))
@@ -160,7 +162,7 @@ Solver.prototype.solveIterativeStep = function ()
 		{
 			if (!this.bestSolution || !this.bestSolution.movesTaken || this.bestSolution.movesTaken.length == 0 || (movesTaken.length < this.bestSolution.movesTaken.length))
 			{
-				//console.log(gCounter + " found new best solution " + this.movesTakenToHumanReadableString(solutionToEval.movesTaken, 4));
+				//console.log(this.counter + " found new best solution " + this.movesTakenToHumanReadableString(solutionToEval.movesTaken, 4));
 				this.bestMovesSoFar = solutionToEval.movesTaken.length;
 				this.bestSolution = solutionToEval;
 
@@ -185,7 +187,7 @@ Solver.prototype.solveIterativeStep = function ()
 	}
 
 	var haveNoSolution = this.bestSolution == null || this.bestSolution.movesTaken == null || this.bestSolution.movesTaken.length == 0;
-	if (haveNoSolution && gCounter > this.probablyGiveUpCap)
+	if (haveNoSolution && this.counter > this.probablyGiveUpCap)
 	{
 		if (this.iterativeProbablyImpossibleCallback)
 			this.iterativeProbablyImpossibleCallback(this);
