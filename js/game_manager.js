@@ -5,6 +5,7 @@ function GameManager(size, InputManager, Actuator, StorageManager, seed, level, 
 	this.medalCount = 0;
 	this.initialSeed = seed;
 	this.seed = seed;
+    this.seedChainCount = 0;
 	this.addTilesOnMove = false;
 	this.winWhenSingleTile = !this.addTilesOnMove;
 	this.numWalls = 4;
@@ -69,6 +70,7 @@ function GameManager(size, InputManager, Actuator, StorageManager, seed, level, 
 GameManager.prototype.restart = function ()
 {
 	this.seed = this.initialSeed;
+    this.seedChainCount = 0;
 	//this.storageManager.clearGameState();
 	this.actuator.continueGame(); // Clear the game won/lost message
 	this.setupInitBy = "Restart";
@@ -121,11 +123,12 @@ GameManager.prototype.setup = function ()
 	// afte rthe last level go into endless mode
 	if(this.level >= this.levels.length)
 	{
-		this.initialSeed = parseInt(this.storageManager.getHighestRandomCompleted())+1;
+		this.seed = this.initialSeed = parseInt(this.storageManager.getHighestRandomCompleted())+1;
 		this.isInfinity = true;
 		this.level = NaN;
 	}
 
+    this.seedChainCount = 0;
 	var previousState = null; //this.storageManager.getGameState();
 
 	// shut down any solver that might be running
@@ -223,21 +226,29 @@ GameManager.prototype.addStartTiles = function ()
 		this.actuator.showLoadingMessage();
 		this.loading = true;
 		
-		this.randomlyFillGrid(this.grid, this.initialSeed);
+		this.randomlyFillGrid(this.grid, this.seed, this.seedChainCount++);
 		
 		// solve it?
 		this.solver = new Solver(this.grid, 25, this.onSolverFinished, this.onSolverFindAnySolution, this.onSolverProbablyGiveUp, this.initialSeed);
 	}
 };
 
-GameManager.prototype.randomlyFillGrid = function(grid, seed)
+GameManager.prototype.randomlyFillGrid = function(grid, seed, chainCount)
 {
 	// save what seed was
-	var seedWas = seed;
+	var seedWas = this.seed;
 
 	// set seed to param
 	this.seed = seed;
+    
+    // crank on the seed a little bit for chaining off initial
+    if(chainCount && !isNaN(chainCount))
+        for(var i = 0; i < chainCount; ++i)
+            var throwaway = this.seededRandom();
 
+    // what was the chained seed result?
+    var chainedSeed = this.seed;
+    
 	// at least 7 tiles, at most 16
 	var tilesToAdd = Math.floor(this.seededRandom() * 16); 
 	if(tilesToAdd < 7)
@@ -253,11 +264,23 @@ GameManager.prototype.randomlyFillGrid = function(grid, seed)
 
 	// restore seed
 	this.seed = seedWas;
+    
+    // return the chained seed
+    return chainedSeed
+};
+
+GameManager.prototype.handleSolverSaysImpossible = function(seed)
+{
+    // make a new grid
+    this.grid = new Grid(this.size);
+    
+    // add start tiles!
+    this.addStartTiles();
 };
 
 GameManager.prototype.onSolverProbablyGiveUp = function (solver)
 {
-	//window.gm.keepPlaying(true);
+	// clear the board and start again
 };
 
 GameManager.prototype.onSolverFindAnySolution = function (solver)
@@ -286,7 +309,8 @@ GameManager.prototype.onSolverFinished = function (solver)
 	if(!solver.bestSolution || !solver.bestSolution.movesTaken || solver.bestSolution.movesTaken.length == 0)
 	{
 		window.gm.solver = null;
-		window.gm.keepPlaying(true);
+		//window.gm.keepPlaying(true);
+        window.gm.handleSolverSaysImpossible();
 	}
 	else
 	{

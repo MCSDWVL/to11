@@ -93,23 +93,30 @@ KeyboardInputManager.prototype.listen = function ()
 			var maxPreSolve = 100;
 			var solveNext = function (solver)
 			{
-				var seed = startSeed;
+				var nextSeed = startSeed;
+                var isChainSeed = false;
 
 				if (solver)
 				{
-					seed = parseInt(solver.seedGeneratedWith) + 1;
+                    var lastSeedFailed = solver.bestSolution.movesTaken.length == 0;
+                    if(lastSeedFailed)
+                    {
+                        isChainSeed = true;
+                        nextSeed = solver.seedGeneratedWith;
+                    }
+                    nextSeed = parseInt(solver.seedGeneratedWith) + 1;
 					bakedString += (solver.bestSolution ? solver.bestSolution.movesTaken.length : 0) + ",";
 					//if (solver.bestSolution)
 					//	console.log(solver.movesTakenToHumanReadableString(solver.bestSolution.movesTaken, 4));
 					console.log("So far " + bakedString);
 				}
 
-				if (seed < startSeed + maxPreSolve)
+				if (nextSeed < startSeed + maxPreSolve || isChainSeed)
 				{
 					// new grid to solve
 					var grid = new Grid(window.gm.size);
-					window.gm.randomlyFillGrid(grid, seed);
-					var solver = new Solver(grid, 25, solveNext, null, null, seed);
+                    window.gm.randomlyFillGrid(grid, nextSeed, isChainSeed ? 1 : 0);
+					var solver = new Solver(grid, 25, solveNext, null, null, nextSeed);
 				}
 				else
 					console.log("done");

@@ -11,11 +11,12 @@ function PresolveManager(size, StorageManager, GameManager)
 	this.gameManager = GameManager;
 	this.preSolvedLevelsQueue = [];
 	this.size = size;
+    this.chainDictionary = {};
 
 	// load the known solutions from storage manager
 	// parse the loaded string and add to global known solutions
 	var bigString = this.storageManager.getPresolvedRandomsLongString();
-	//console.log("psm: big string " + bigString);
+	console.log("psm: big string " + bigString);
 	this.convertAllPreSolvedStringToSolutionsAndAddToKnownSolutions(bigString);
 
 	if (!this.preSolvedLevelsQueue || this.preSolvedLevelsQueue.length == 0)
@@ -135,6 +136,8 @@ PresolveManager.prototype.onLevelSolved = function (solver)
 	var userLowestInfinitySeed = parseInt(this.storageManager.getHighestRandomCompleted());
 	var anythingChanged = false;
 	var shouldSolveAnother = false;
+    var shouldChainSolve = false;
+    var chainStart = this.chainDictionary[seed];
 
 	// dequeue any solutions that are below the users next infinity seed (don't need to keep them presolved anymore)
 	while (this.preSolvedLevelsQueue && this.preSolvedLevelsQueue.length > 0 && this.preSolvedLevelsQueue[0].seed < userLowestInfinitySeed)
@@ -144,16 +147,41 @@ PresolveManager.prototype.onLevelSolved = function (solver)
 	}
 
 	// enqueue the new solutions
+    var shouldSaveNewSolution = true; // why would we ever presolve and not save?
+    
+    // if we already know the solution for this grid don't bother
+	for (var i = 0; i < this.preSolvedLevelsQueue.length; ++i)
+	{
+		if (this.preSolvedLevelsQueue[i].board == solver.startingBoardString)
+        {
+            shouldSaveNewSolution = false;
+            break;
+        }
+	}
+    
+    // save the new solution!
+    if(shouldSaveNewSolution)
+    {
+        var newSolution = {};
+        newSolution.seed = !isNaN(chainStart) ? chainStart : seed;
+        newSolution.chainSeed = seed;
+        newSolution.board = solver.startingBoardString;
+        newSolution.movesTaken = solver.bestSolution ? solver.bestSolution.movesTaken : [];
+        this.preSolvedLevelsQueue.push(newSolution);
+        anythingChanged = true;
+    }
+    
+    // should we solve the next sequential seed?
 	if (seed < userLowestInfinitySeed + this.infinityStorageRange)
 	{
-		var newSolution = {};
-		newSolution.seed = seed;
-		newSolution.board = solver.startingBoardString;
-		newSolution.movesTaken = solver.bestSolution ? solver.bestSolution.movesTaken : [];
-		this.preSolvedLevelsQueue.push(newSolution);
-		anythingChanged = true;
 		shouldSolveAnother = true;
 	}
+    
+    // should we chain solve off this seed?
+    if(solver.bestSolution.movesTaken.length == 0)
+    {
+        shouldChainSolve = true;
+    }
 
 	// update local store?
 	if (anythingChanged)
@@ -162,36 +190,38 @@ PresolveManager.prototype.onLevelSolved = function (solver)
 		this.storageManager.setPresolvedRandomsLongString(bigString);
 	}
 
+    // should we pre-solve the chain?
+    if(shouldChainSolve)
+        this.preSolve(seed, 1);
+        
 	// should we pre-solve the next level?
 	if (shouldSolveAnother)
-	{
 		this.preSolve(seed + 1);
-	}
 	else
 		console.log("Done pre-solving for now!");
 };
 
 //-----------------------------------------------------------------------------
 // pre solve a given seed by generating board and creating solver
-PresolveManager.prototype.preSolve = function (seed)
+PresolveManager.prototype.preSolve = function (seed, chain)
 {
 	//debug shit
 	var userLowestInfinitySeed = parseInt(this.storageManager.getHighestRandomCompleted());
-	console.log("Presolving " + seed + " (going up to " + (userLowestInfinitySeed + this.infinityStorageRange) + ")...");
-
+	
 	// make the grid that corresponds to this seed
 	var grid = new Grid(this.size);
-	this.gameManager.randomlyFillGrid(grid, seed);
-
-	// if we already know the solution for this grid don't bother
-	for (var i = 0; i < this.preSolvedLevelsQueue.length; ++i)
-	{
-		if (this.preSolvedLevelsQueue[i].board == grid.asSimpleString())
-			return;
-	}
-
+	var chainedSeed = this.gameManager.randomlyFillGrid(grid, seed, chain ? 1 : 0);
+    
+    // track the chain reason we're solving this seed!
+    var chainRoot = this.chainDictionary[seed];
+    chainRoot = isNaN(chainRoot) ? seed : chainRoot;
+    this.chainDictionary[chainedSeed] = chainRoot;
+    
+    // logging
+    console.log("Presolving " + chainedSeed + "(" + chainRoot + ")" + " (going up to " + (userLowestInfinitySeed + this.infinityStorageRange) + ")...");
+    
 	// create the solver
-	var solver = new Solver(grid, 25, this.onLevelSolved.bind(this), null, null, seed);
+	var solver = new Solver(grid, 25, this.onLevelSolved.bind(this), null, null, chainedSeed);
 };
 
 //-----------------------------------------------------------------------------
