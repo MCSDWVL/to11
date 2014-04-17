@@ -220,10 +220,11 @@ HTMLActuator.prototype.showLoadingMessage = function (show)
 HTMLActuator.prototype.message = function (won)
 {
 	var type = won ? "game-won" : "game-over";
-	var message =  won ? "You win!" : "Too Many Moves!";
+	var message = won ? "You win!" : "Too Many Moves!";
 
 	this.messageContainer.classList.add(type);
-	this.messageContainer.getElementsByTagName("p")[0].textContent = message;
+	this.messageContainer.getElementsByTagName("p")[0].innerHTML = message;
+	this.messageContainer.getElementsByClassName("share")[0].style.visibility = won ? "visible" : "hidden";
 
 	var medalClass = won ? ["none", "bronze", "silver", "gold", "supermedal"][this.medalLevel] : "none";
 	this.messageContainer.getElementsByClassName("won-medal")[0].classList.add("large-medal");

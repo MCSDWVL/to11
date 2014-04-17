@@ -173,15 +173,11 @@ PresolveManager.prototype.onLevelSolved = function (solver)
     
     // should we solve the next sequential seed?
 	if (seed < userLowestInfinitySeed + this.infinityStorageRange)
-	{
 		shouldSolveAnother = true;
-	}
     
     // should we chain solve off this seed?
     if(solver.bestSolution.movesTaken.length == 0)
-    {
         shouldChainSolve = true;
-    }
 
 	// update local store?
 	if (anythingChanged)
@@ -197,15 +193,13 @@ PresolveManager.prototype.onLevelSolved = function (solver)
 	// should we pre-solve the next level?
 	if (shouldSolveAnother)
 		this.preSolve(seed + 1);
-	else
-		console.log("Done pre-solving for now!");
 };
 
 //-----------------------------------------------------------------------------
 // pre solve a given seed by generating board and creating solver
 PresolveManager.prototype.preSolve = function (seed, chain)
 {
-	//debug shit
+	//
 	var userLowestInfinitySeed = parseInt(this.storageManager.getHighestRandomCompleted());
 	
 	// make the grid that corresponds to this seed
