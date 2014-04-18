@@ -224,7 +224,9 @@ HTMLActuator.prototype.message = function (won)
 
 	this.messageContainer.classList.add(type);
 	this.messageContainer.getElementsByTagName("p")[0].innerHTML = message;
-	this.messageContainer.getElementsByClassName("share")[0].style.visibility = won ? "visible" : "hidden";
+	var shareElements = this.messageContainer.getElementsByClassName("share");
+	for(var i = 0; i < shareElements.length; ++i)
+		shareElements[i].style.visibility = won ? "visible" : "hidden";
 
 	var medalClass = won ? ["none", "bronze", "silver", "gold", "supermedal"][this.medalLevel] : "none";
 	this.messageContainer.getElementsByClassName("won-medal")[0].classList.add("large-medal");
