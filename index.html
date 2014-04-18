@@ -14,6 +14,16 @@
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0, maximum-scale=1, user-scalable=no, minimal-ui">
 </head>
 <body>
+	<div id="fb-root"></div>
+	<script>	(function (d, s, id)
+	{
+		var js, fjs = d.getElementsByTagName(s)[0];
+		if (d.getElementById(id)) return;
+		js = d.createElement(s); js.id = id;
+		js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+		fjs.parentNode.insertBefore(js, fjs);
+	} (document, 'script', 'facebook-jssdk'));
+	</script>
   <div class="container">
     <div class="heading">
       <h1 class="title">to11</h1>
@@ -39,8 +49,10 @@
 		<div class="won-medal"></div>
         <p></p>
 		<div class="share">
-			<a href="https://twitter.com/share" class="twitter-share-button" data-text="I just won a game of to11, 2048 puzzle challenge!" data-hashtags="to11">Tweet</a>
-			<script>				!function (d, s, id) { var js, fjs = d.getElementsByTagName(s)[0], p = /^http:/.test(d.location) ? 'http' : 'https'; if (!d.getElementById(id)) { js = d.createElement(s); js.id = id; js.src = p + '://platform.twitter.com/widgets.js'; fjs.parentNode.insertBefore(js, fjs); } } (document, 'script', 'twitter-wjs');</script>
+			<div>
+				<a href="https://twitter.com/share" class="twitter-share-button" data-text="I just won a game of to11, 2048 puzzle challenge!" data-hashtags="to11">Tweet</a>
+				<script>				!function (d, s, id) { var js, fjs = d.getElementsByTagName(s)[0], p = /^http:/.test(d.location) ? 'http' : 'https'; if (!d.getElementById(id)) { js = d.createElement(s); js.id = id; js.src = p + '://platform.twitter.com/widgets.js'; fjs.parentNode.insertBefore(js, fjs); } } (document, 'script', 'twitter-wjs');</script>
+			</div>
 		</div>
         <div class="lower">
 	        <a class="keep-playing-button">Next Game</a>
@@ -99,6 +111,11 @@
 	</p>
     <hr>
     <p>Created by Matthew Vassilakos.  Based on <a href="http://gabrielecirulli.github.io/2048">2048 by Gabriele Cirulli</a>. email: matthew.vassilakos@gmail.com</p>
+	<div>
+		<a href="https://twitter.com/share" class="twitter-share-button" data-text="I just won a game of to11, 2048 puzzle challenge!" data-hashtags="to11">Tweet</a>
+		<script>					!function (d, s, id) { var js, fjs = d.getElementsByTagName(s)[0], p = /^http:/.test(d.location) ? 'http' : 'https'; if (!d.getElementById(id)) { js = d.createElement(s); js.id = id; js.src = p + '://platform.twitter.com/widgets.js'; fjs.parentNode.insertBefore(js, fjs); } } (document, 'script', 'twitter-wjs');</script>
+	</div>
+	<div class="fb-share-button" data-href="http://mcsdwvl.github.io/to11/" data-type="button_count"></div>
   </div>
 
   <script src="js/analytics.js"></script>
