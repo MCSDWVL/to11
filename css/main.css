@@ -907,5 +907,7 @@ hr {
 
 a { -webkit-tap-highlight-color: rgba(0,0,0,0); }
 
-share { float:left; }
+.share { float:left; }
+.twitter-share-button { float:left; }
+.fb-like { float:left; }
 
