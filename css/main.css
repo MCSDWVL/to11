@@ -208,6 +208,9 @@ hr {
     .game-container .game-message.game-won {
       background: rgba(237, 194, 46, 0.5);
       color: #f9f6f2; }
+    .game-container .game-message.game-over 
+    {
+    	 color: #f9f6f2; }
       .game-container .game-message.game-won a.keep-playing-button {
         display: inline-block; }
     .game-container .game-message.game-won, .game-container .game-message.game-over, .game-container .game-message.game-loading {
