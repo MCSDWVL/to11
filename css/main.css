@@ -915,6 +915,14 @@ a { -webkit-tap-highlight-color: rgba(0,0,0,0); }
 .fb-share { float:left;}
 
 
+@media screen and (max-width: 520px) 
+{
+	.share 
+	{ 
+		width:320px; 
+	}
+}
+
 @media screen and (max-width: 350px) 
 {
 	.next-button, .restart-button, .menu-button 
