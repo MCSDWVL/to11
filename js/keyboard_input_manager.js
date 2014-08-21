@@ -68,7 +68,7 @@ KeyboardInputManager.prototype.listen = function ()
 
 		// "R" key does robot shit
 		if (!modifiers && event.which === 82)
-			var solver = new Solver(window.gm.grid, 50, function (solver) { console.log(solver.movesTakenToHumanReadableString(solver.bestSolution.movesTaken, 4)); });
+			var solver = new Solver(window.gm.grid, 50, function (solver) { console.log(solver.movesTakenToHumanReadableString(solver.bestSolution.movesTaken, 4)); }, null, null, null, 50000);
 
 		// "U" unlocks all levels
 		if (!modifiers && event.which == 85)

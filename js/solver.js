@@ -3,13 +3,16 @@
 var gKnownSolutions = {};
 
 //-----------------------------------------------------------------------------
-function Solver(grid, maxMoves, finishCallback, newBestCallback, probablyImpossibleCallback, seed)
+function Solver(grid, maxMoves, finishCallback, newBestCallback, probablyImpossibleCallback, seed, giveUpCap)
 {
 	if(maxMoves == null || maxMoves == undefined || maxMoves <= 0 || isNaN(maxMoves))
 		maxMoves = 50;
 
+	if (giveUpCap == null || giveUpCap == undefined || giveUpCap <= 0 || isNaN(giveUpCap))
+		giveUpCap = 5000;
+
 	this.counter = 0;
-	this.probablyGiveUpCap = 5000;
+	this.probablyGiveUpCap = giveUpCap;
 	this.startingBoardString = this.getGridAsSimpleString(grid);
 	console.log("Starting solver for " + this.startingBoardString + " " + seed);
 	this.grid = grid;
@@ -71,6 +74,7 @@ Solver.prototype.doInitialKnownSolutionCheck = function ()
 		{
 			if (this.iterativeProbablyImpossibleCallback)
 				this.iterativeProbablyImpossibleCallback(this);
+			console.log("probably impossible!");
 		}
 		else if (this.iterativeNewBestCallback)
 		{
@@ -162,7 +166,7 @@ Solver.prototype.solveIterativeStep = function ()
 		{
 			if (!this.bestSolution || !this.bestSolution.movesTaken || this.bestSolution.movesTaken.length == 0 || (movesTaken.length < this.bestSolution.movesTaken.length))
 			{
-				//console.log(this.counter + " found new best solution " + this.movesTakenToHumanReadableString(solutionToEval.movesTaken, 4));
+				console.log(this.counter + " found new best solution (" + solutionToEval.movesTaken.length + " moves) - " + this.movesTakenToHumanReadableString(solutionToEval.movesTaken, 4));
 				this.bestMovesSoFar = solutionToEval.movesTaken.length;
 				this.bestSolution = solutionToEval;
 
@@ -191,8 +195,11 @@ Solver.prototype.solveIterativeStep = function ()
 	{
 		if (this.iterativeProbablyImpossibleCallback)
 			this.iterativeProbablyImpossibleCallback(this);
+		console.log("probably impossible!");
 		this.solveIterativeFinish();
 	}
+	else if (this.counter % 5000 == 0)
+		console.log("Tried " + this.counter + " solutions...");
 
 	this.busy = false;
 };
